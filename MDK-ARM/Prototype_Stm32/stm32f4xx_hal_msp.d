@@ -55,3 +55,4 @@ prototype_stm32\stm32f4xx_hal_msp.o: ../Core/Inc/usart.h
 prototype_stm32\stm32f4xx_hal_msp.o: ../Core/Inc/tim.h
 prototype_stm32\stm32f4xx_hal_msp.o: ../Platform/Motor/StepMotor.h
 prototype_stm32\stm32f4xx_hal_msp.o: ../Platform/SERIAL_FRAME/serial_frame.h
+prototype_stm32\stm32f4xx_hal_msp.o: ../Platform/Motor/Neck.h

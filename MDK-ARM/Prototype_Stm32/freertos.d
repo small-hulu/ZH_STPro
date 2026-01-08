@@ -55,4 +55,6 @@ prototype_stm32\freertos.o: ../Core/Inc/usart.h
 prototype_stm32\freertos.o: ../Core/Inc/tim.h
 prototype_stm32\freertos.o: ../Platform/Motor/StepMotor.h
 prototype_stm32\freertos.o: ../Platform/SERIAL_FRAME/serial_frame.h
+prototype_stm32\freertos.o: ../Platform/Motor/Neck.h
 prototype_stm32\freertos.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os.h
+prototype_stm32\freertos.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/semphr.h

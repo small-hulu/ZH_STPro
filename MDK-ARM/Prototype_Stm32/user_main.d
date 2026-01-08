@@ -55,3 +55,4 @@ prototype_stm32\user_main.o: ../Platform/Motor/motor.h
 prototype_stm32\user_main.o: ../Core/Inc/tim.h
 prototype_stm32\user_main.o: ../Platform/Motor/StepMotor.h
 prototype_stm32\user_main.o: ../Platform/SERIAL_FRAME/serial_frame.h
+prototype_stm32\user_main.o: ../Platform/Motor/Neck.h

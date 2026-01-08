@@ -56,3 +56,4 @@ prototype_stm32\dma.o: ../Core/Inc/usart.h
 prototype_stm32\dma.o: ../Core/Inc/tim.h
 prototype_stm32\dma.o: ../Platform/Motor/StepMotor.h
 prototype_stm32\dma.o: ../Platform/SERIAL_FRAME/serial_frame.h
+prototype_stm32\dma.o: ../Platform/Motor/Neck.h

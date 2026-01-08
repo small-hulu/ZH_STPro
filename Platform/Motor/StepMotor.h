@@ -41,7 +41,8 @@
 void Stepper_Init(void);
 void Stepper_SetSpeed(uint16_t rpm);
 void Stepper_Step(uint8_t side, uint8_t direction);
-void Stepper_RotateAngle(float angle, uint8_t direction);
+void Stepper_RotateAngle1(float angle, uint8_t direction);
+void Stepper_RotateAngle2(float angle, uint8_t direction);
 void Stepper_RotateCircle(uint8_t side, float circles, uint8_t direction);
 void Stepper_Stop(uint8_t side);
 

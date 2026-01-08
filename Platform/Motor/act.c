@@ -103,7 +103,7 @@ void Motor_SetSpeed_FromCmd(const cmd_vel_t *cmd, uint8_t acc)
 void ArmWave()
 {
 	Stepper_SetSpeed(8);
-	Stepper_RotateAngle(15, STEPPER_BACKWARD);//左翅中摆动
+	Stepper_RotateAngle1(15, STEPPER_BACKWARD);//左翅中摆动
 	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, 2000);//右翅尖摆动
 	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_2, 1000);
 	osDelay(100);
@@ -116,14 +116,14 @@ void ArmWave()
 	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, 2000);//右翅尖摆动
 	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_2, 2000);
 	osDelay(200);
-	Stepper_RotateAngle(15, STEPPER_FORWARD);//左翅中摆动
+	Stepper_RotateAngle1(15, STEPPER_FORWARD);//左翅中摆动
 }
 /*************************上下扑棱***************************/
 void ArmUpDown(){
 	Stepper_SetSpeed(10);
 
-	Stepper_RotateAngle(5, STEPPER_FORWARD);//左翅中摆动
-	Stepper_RotateAngle(5, STEPPER_FORWARD);//右翅中摆动
+	Stepper_RotateAngle1(5, STEPPER_FORWARD);//左翅中摆动
+	Stepper_RotateAngle2(5, STEPPER_FORWARD);//右翅中摆动
 	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, 1000);//左翅尖摆动
 	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, 2000);
 	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, 2000);//右翅尖摆动
@@ -134,8 +134,8 @@ void ArmUpDown(){
 	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, 2000);//右翅尖摆动
 	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_2, 2000);
 	osDelay(200);
-	Stepper_RotateAngle(10, STEPPER_BACKWARD);//左翅中摆动
-	Stepper_RotateAngle(10, STEPPER_BACKWARD);//右翅中摆动
+	Stepper_RotateAngle1(10, STEPPER_BACKWARD);//左翅中摆动
+	Stepper_RotateAngle2(10, STEPPER_BACKWARD);//右翅中摆动
 	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, 2000);//左翅尖摆动
 	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, 1000);
 	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, 1000);//右翅尖摆动
@@ -146,8 +146,8 @@ void ArmUpDown(){
 	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, 2000);//右翅尖摆动
 	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_2, 2000);
 	osDelay(200);
-	Stepper_RotateAngle(10, STEPPER_FORWARD);//左翅中摆动
-	Stepper_RotateAngle(10, STEPPER_FORWARD);//右翅中摆动
+	Stepper_RotateAngle1(10, STEPPER_FORWARD);//左翅中摆动
+	Stepper_RotateAngle2(10, STEPPER_FORWARD);//右翅中摆动
 	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, 1000);//左翅尖摆动
 	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, 2000);
 	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, 2000);//右翅尖摆动
@@ -158,8 +158,8 @@ void ArmUpDown(){
 	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, 2000);//右翅尖摆动
 	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_2, 2000);
 	osDelay(200);
-	Stepper_RotateAngle(5, STEPPER_BACKWARD);//左翅中摆动
-	Stepper_RotateAngle(5, STEPPER_BACKWARD);//右翅中摆动
+	Stepper_RotateAngle1(5, STEPPER_BACKWARD);//左翅中摆动
+	Stepper_RotateAngle2(5, STEPPER_BACKWARD);//右翅中摆动
 	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, 2000);//左翅尖摆动
 	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, 1000);
 	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, 1000);//右翅尖摆动

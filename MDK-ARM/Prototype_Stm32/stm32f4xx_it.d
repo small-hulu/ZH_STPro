@@ -55,4 +55,5 @@ prototype_stm32\stm32f4xx_it.o: ../Core/Inc/usart.h
 prototype_stm32\stm32f4xx_it.o: ../Core/Inc/tim.h
 prototype_stm32\stm32f4xx_it.o: ../Platform/Motor/StepMotor.h
 prototype_stm32\stm32f4xx_it.o: ../Platform/SERIAL_FRAME/serial_frame.h
+prototype_stm32\stm32f4xx_it.o: ../Platform/Motor/Neck.h
 prototype_stm32\stm32f4xx_it.o: ../Core/Inc/stm32f4xx_it.h

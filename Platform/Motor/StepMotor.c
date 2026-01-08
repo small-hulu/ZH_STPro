@@ -31,6 +31,11 @@ const uint8_t stepSequence[8] = {
 		0x08,*/
 };
 
+void Stepper_Init(){
+	Stepper_Stop(Left);
+	Stepper_Stop(Right);
+}
+
 void Stepper_SetSpeed(uint16_t rpm) {
     if (rpm == 0) return;
     stepDelay = (60 * 1000000) / (rpm * TOTAL_STEPS_PER_REV);
@@ -65,20 +70,30 @@ void Stepper_Step(uint8_t side,uint8_t direction) {
 		}
 
 	setOutput(side,~stepSequence[currentStep]);  //UNL2003 ~
-
-    HAL_Delay(stepDelay/1000);
+    osDelay(stepDelay/1000);
  /*   if (stepDelay % 1000 > 0) {
         delay_us(stepDelay % 1000);
     }*/
 }
 
-void Stepper_RotateAngle(float angle, uint8_t direction) {
+void Stepper_RotateAngle1(float angle, uint8_t direction) {
+    uint32_t steps = (uint32_t)((angle / 360.0f) * TOTAL_STEPS_PER_REV)/2;
+    for (uint32_t i = 0; i < steps; i++) {
+        Stepper_Step(Left,direction);
+        //Stepper_Step(Right,direction);
+    }
+    Stepper_Stop(Left);
+    //Stepper_Stop(Right);
+}
+void Stepper_RotateAngle2(float angle, uint8_t direction) {
     uint32_t steps = (uint32_t)((angle / 360.0f) * TOTAL_STEPS_PER_REV)/2;
 
     for (uint32_t i = 0; i < steps; i++) {
-        Stepper_Step(Left,direction);
+        //Stepper_Step(Left,direction);
         Stepper_Step(Right,direction);
     }
+    //Stepper_Stop(Left);
+    Stepper_Stop(Right);
 }
 
 void Stepper_RotateCircle(uint8_t side, float circles, uint8_t direction) {

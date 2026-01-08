@@ -31,7 +31,8 @@
 #define INC_NECK_H_
 
 #include "stm32f4xx_hal.h"
-
+extern int16_t neck_r_cur_angle;
+extern int16_t neck_r_target_angle;
 #define NECK_1_MIN 75
 #define NECK_1_MID 120
 #define NECK_1_MAX 140
@@ -45,9 +46,9 @@
 #define NECK_3_MID 120
 #define NECK_3_MAX 140
 
-#define NECK_R_MIN 50
+#define NECK_R_MIN 50    //0
 #define NECK_R_MID 150
-#define NECK_R_MAX 250
+#define NECK_R_MAX 250   
 
 #define NeckNod_DOWN 0
 #define NeckNod_UP 1
@@ -58,6 +59,10 @@ void NeckInt();
 void NeckNod();
 void NeckUpDown();
 void NeckShow();
-
+void TestNod();
+void Neckinit();
+uint16_t neck_angle_to_ccr(int16_t angle);
+void Neck_R_SetTargetAngle(int16_t angle);
+void Neck_R_Update(void);
 #endif
 /* USER CODE END */

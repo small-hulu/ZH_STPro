@@ -22,7 +22,7 @@
 #include "task.h"
 #include "main.h"
 #include "cmsis_os.h"
-
+#include "semphr.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "usart.h"
@@ -67,11 +67,24 @@ osThreadId_t status_taskHandle;
 const osThreadAttr_t status_task_attributes = {
   .name = "status_task",
   .stack_size = 512 * 4,
-  .priority = (osPriority_t) osPriorityLow,
+  .priority = (osPriority_t) osPriorityNormal,
+};
+/* Definitions for neckTask */
+osThreadId_t neckTaskHandle;
+const osThreadAttr_t neckTask_attributes = {
+  .name = "neckTask",
+  .stack_size = 256 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
 };
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
+typedef struct {
+    int16_t angle; 
+		int8_t  pitch_angle;  //0x01 20
+} neck_cmd_t;
+
+QueueHandle_t neckQueue;
 QueueHandle_t uartQueue;
 fsm_lib_return main_ctrl_fsm(fsm_lib_ctrl_handle *handle);
 fsm_lib_ctrl_handle main_ctrl_fsm_handle;
@@ -81,6 +94,7 @@ fsm_lib_ctrl_handle main_ctrl_fsm_handle;
 void StartDefaultTask(void *argument);
 void fun_ctrl_Task(void *argument);
 void Status_Task(void *argument);
+void NeckTask(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -100,6 +114,8 @@ void MX_FREERTOS_Init(void) {
 
   /* USER CODE BEGIN RTOS_SEMAPHORES */
   /* add semaphores, ... */
+
+	
   /* USER CODE END RTOS_SEMAPHORES */
 
   /* USER CODE BEGIN RTOS_TIMERS */
@@ -111,7 +127,8 @@ void MX_FREERTOS_Init(void) {
 	
 	uartQueue = xQueueCreate(4,sizeof(uart_frame_t));
 	configASSERT(uartQueue != NULL);
-	
+	neckQueue = xQueueCreate(16, sizeof(neck_cmd_t)); 
+	configASSERT(neckQueue != NULL);
   /* USER CODE END RTOS_QUEUES */
 
   /* Create the thread(s) */
@@ -123,6 +140,9 @@ void MX_FREERTOS_Init(void) {
 
   /* creation of status_task */
   status_taskHandle = osThreadNew(Status_Task, NULL, &status_task_attributes);
+
+  /* creation of neckTask */
+  neckTaskHandle = osThreadNew(NeckTask, NULL, &neckTask_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -142,12 +162,13 @@ void MX_FREERTOS_Init(void) {
   */
 serial_frame_t pkt;
 cmd_vel_t cmd;
+uint8_t  cur_cmd;
 /* USER CODE END Header_StartDefaultTask */
 void StartDefaultTask(void *argument)
 {
   /* USER CODE BEGIN StartDefaultTask */
   /* Infinite loop */
-	printf("StartDefaultTask\r\n");
+	//printf("StartDefaultTask\r\n");
   uint16_t rx_len;
 	uart_frame_t frame;
 	uint8_t tx_buf[32];
@@ -161,7 +182,7 @@ void StartDefaultTask(void *argument)
 					//printf("%s", frame.data);
 					serial_frame_ret_t ret =
                 serial_frame_parse((uint8_t *)frame.data, frame.len, &pkt);
-						
+						cur_cmd = pkt.cmd;
             if (ret == SERIAL_FRAME_OK)
             {
                 switch (pkt.cmd)
@@ -206,6 +227,23 @@ void StartDefaultTask(void *argument)
 										HAL_UART_Transmit(&huart6, tx_buf, tx_len, 100);
                     break;
 								}
+								case 0x05:
+								{
+										//ack
+										int16_t angle = (pkt.data[0] << 8) | pkt.data[1];
+										int8_t pitch_angle = (int8_t)pkt.data[3];
+										neck_cmd_t cmd = {
+																	.angle = angle,
+																	.pitch_angle = pitch_angle
+										};
+
+										xQueueSendToBack(neckQueue, &cmd, 0);
+  
+										uint8_t ack_data[] = {0x00};
+										tx_len = serial_frame_build(0x85, ack_data, 1,tx_buf, sizeof(tx_buf));
+										HAL_UART_Transmit(&huart6, tx_buf, tx_len, 100);
+                    break;
+								}
                 default:
                     break;
                 }
@@ -231,22 +269,41 @@ void fun_ctrl_Task(void *argument)
 {
   /* USER CODE BEGIN fun_ctrl_Task */
 	
+	//neck_init
+		Neckinit();
+	
 	fsm_lib_start(&main_ctrl_fsm_handle);
   /* Infinite loop */
-	//ArmUpDown();
-//	Stepper_SetSpeed(8);
-//	Stepper_RotateAngle(15, STEPPER_BACKWARD);
-	ArmWave();
-	//Stepper_RotateAngle(15, STEPPER_FORWARD);
+	int16_t start_angle = 90;
+  int16_t end_angle   = 140;
+  neck_cmd_t cmd;
+
   for(;;)
   {
+			// ??
+        for (int16_t angle = start_angle; angle <= end_angle; angle += 2)
+        {
+            cmd.angle = angle;
+            xQueueSendToBack(neckQueue, &cmd, 0); // ?????
+            osDelay(20); // 40ms????????
+        }
+
+        // ??
+        for (int16_t angle = end_angle; angle >= start_angle; angle -= 2)
+        {
+            cmd.angle = angle;
+            xQueueSendToBack(neckQueue, &cmd, 0);
+            osDelay(20);
+        }
+
+        osDelay(200); 
 //		fsm_lib_return ret = main_ctrl_fsm(&main_ctrl_fsm_handle);
 //		if (ret == fsm_rt_idle) {
 //        osDelay(10);
 //    } else {
 //        osDelay(1);
 //    }
-		osDelay(10);
+		osDelay(100);
   }
   /* USER CODE END fun_ctrl_Task */
 }
@@ -269,6 +326,37 @@ void Status_Task(void *argument)
 		osDelay(1000);
   }
   /* USER CODE END Status_Task */
+}
+
+/* USER CODE BEGIN Header_NeckTask */
+/**
+* @brief Function implementing the neckTask thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_NeckTask */
+void NeckTask(void *argument)
+{
+  /* USER CODE BEGIN NeckTask */
+  /* Infinite loop */
+	TickType_t last = xTaskGetTickCount();
+	neck_cmd_t cmd;
+  for(;;)
+  {
+      if (xQueueReceive(neckQueue, &cmd, portMAX_DELAY) == pdTRUE)
+      {
+          Neck_R_SetTargetAngle(cmd.angle);
+
+          
+          last = xTaskGetTickCount();
+          while (neck_r_cur_angle != neck_r_target_angle)
+          {
+              Neck_R_Update();
+              vTaskDelayUntil(&last, pdMS_TO_TICKS(40)); 
+          }
+      }
+  }
+  /* USER CODE END NeckTask */
 }
 
 /* Private application code --------------------------------------------------*/

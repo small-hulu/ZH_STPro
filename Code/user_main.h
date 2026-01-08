@@ -39,6 +39,7 @@
 #include "tim.h"
 #include "StepMotor.h"
 #include "serial_frame.h"
+#include "Neck.h"
 // app
 
 void bsp_init();

@@ -24,7 +24,7 @@ void user_main() {
     //osKernelInitialize();
     bsp_init();
 
-	
+		
     // initialize rtos kernel
     // task init
     // os start, never return if success

@@ -55,6 +55,7 @@ prototype_stm32\main.o: ../Core/Inc/usart.h
 prototype_stm32\main.o: ../Core/Inc/tim.h
 prototype_stm32\main.o: ../Platform/Motor/StepMotor.h
 prototype_stm32\main.o: ../Platform/SERIAL_FRAME/serial_frame.h
+prototype_stm32\main.o: ../Platform/Motor/Neck.h
 prototype_stm32\main.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os.h
 prototype_stm32\main.o: ../Core/Inc/dma.h
 prototype_stm32\main.o: ../Core/Inc/gpio.h

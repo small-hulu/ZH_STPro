@@ -55,4 +55,5 @@ prototype_stm32\motor.o: ../Platform/Motor/motor.h
 prototype_stm32\motor.o: ../Core/Inc/tim.h
 prototype_stm32\motor.o: ../Platform/Motor/StepMotor.h
 prototype_stm32\motor.o: ../Platform/SERIAL_FRAME/serial_frame.h
+prototype_stm32\motor.o: ../Platform/Motor/Neck.h
 prototype_stm32\motor.o: D:\zrh\MDK5\ARM\ARMCC\Bin\..\include\math.h
