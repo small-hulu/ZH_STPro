@@ -1,9 +1,9 @@
 prototype_stm32\tasks.o: ../Middlewares/Third_Party/FreeRTOS/Source/tasks.c
-prototype_stm32\tasks.o: D:\zrh\MDK5\ARM\ARMCC\Bin\..\include\stdlib.h
-prototype_stm32\tasks.o: D:\zrh\MDK5\ARM\ARMCC\Bin\..\include\string.h
+prototype_stm32\tasks.o: C:\Users\ZEHO\AppData\Local\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
+prototype_stm32\tasks.o: C:\Users\ZEHO\AppData\Local\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 prototype_stm32\tasks.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h
-prototype_stm32\tasks.o: D:\zrh\MDK5\ARM\ARMCC\Bin\..\include\stddef.h
-prototype_stm32\tasks.o: D:\zrh\MDK5\ARM\ARMCC\Bin\..\include\stdint.h
+prototype_stm32\tasks.o: C:\Users\ZEHO\AppData\Local\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
+prototype_stm32\tasks.o: C:\Users\ZEHO\AppData\Local\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 prototype_stm32\tasks.o: ../Core/Inc/FreeRTOSConfig.h
 prototype_stm32\tasks.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h
 prototype_stm32\tasks.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h

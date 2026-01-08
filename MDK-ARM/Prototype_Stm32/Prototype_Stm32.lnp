@@ -1,5 +1,6 @@
 --cpu=Cortex-M4.fp.sp
 "prototype_stm32\startup_stm32f407xx.o"
+"prototype_stm32\demo.o"
 "prototype_stm32\main.o"
 "prototype_stm32\gpio.o"
 "prototype_stm32\freertos.o"
@@ -41,6 +42,11 @@
 "prototype_stm32\motor.o"
 "prototype_stm32\stepmotor.o"
 "prototype_stm32\serial_frame.o"
+"prototype_stm32\atk_ms6dsv.o"
+"prototype_stm32\atk_ms6dsv_iic.o"
+"prototype_stm32\lsm6dsv16x_reg.o"
+"prototype_stm32\delay.o"
+"prototype_stm32\sys.o"
 "prototype_stm32\neck.o"
 "prototype_stm32\user_main.o"
 --strict --scatter "Prototype_Stm32\Prototype_Stm32.sct"

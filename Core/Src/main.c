@@ -23,7 +23,7 @@
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
-
+#include "../Platform/IMU/delay.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "user_main.h"
@@ -77,9 +77,8 @@ int main(void)
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
-
+	delay_init();
   /* USER CODE BEGIN Init */
-	
   /* USER CODE END Init */
 
   /* Configure the system clock */

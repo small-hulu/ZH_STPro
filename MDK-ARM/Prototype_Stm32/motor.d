@@ -8,7 +8,7 @@ prototype_stm32\motor.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h
 prototype_stm32\motor.o: ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h
 prototype_stm32\motor.o: ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f407xx.h
 prototype_stm32\motor.o: ../Drivers/CMSIS/Include/core_cm4.h
-prototype_stm32\motor.o: D:\zrh\MDK5\ARM\ARMCC\Bin\..\include\stdint.h
+prototype_stm32\motor.o: C:\Users\ZEHO\AppData\Local\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 prototype_stm32\motor.o: ../Drivers/CMSIS/Include/cmsis_version.h
 prototype_stm32\motor.o: ../Drivers/CMSIS/Include/cmsis_compiler.h
 prototype_stm32\motor.o: ../Drivers/CMSIS/Include/cmsis_armcc.h
@@ -16,7 +16,7 @@ prototype_stm32\motor.o: ../Drivers/CMSIS/Include/mpu_armv7.h
 prototype_stm32\motor.o: ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/system_stm32f4xx.h
 prototype_stm32\motor.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h
 prototype_stm32\motor.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h
-prototype_stm32\motor.o: D:\zrh\MDK5\ARM\ARMCC\Bin\..\include\stddef.h
+prototype_stm32\motor.o: C:\Users\ZEHO\AppData\Local\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
 prototype_stm32\motor.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc_ex.h
 prototype_stm32\motor.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio.h
 prototype_stm32\motor.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio_ex.h
@@ -46,13 +46,13 @@ prototype_stm32\motor.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/task
 prototype_stm32\motor.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/list.h
 prototype_stm32\motor.o: ../Code/user_main.h
 prototype_stm32\motor.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h
-prototype_stm32\motor.o: D:\zrh\MDK5\ARM\ARMCC\Bin\..\include\stdio.h
+prototype_stm32\motor.o: C:\Users\ZEHO\AppData\Local\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
 prototype_stm32\motor.o: ../Platform/FSM/fsm_lib.h
-prototype_stm32\motor.o: D:\zrh\MDK5\ARM\ARMCC\Bin\..\include\stdlib.h
-prototype_stm32\motor.o: D:\zrh\MDK5\ARM\ARMCC\Bin\..\include\string.h
+prototype_stm32\motor.o: C:\Users\ZEHO\AppData\Local\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
+prototype_stm32\motor.o: C:\Users\ZEHO\AppData\Local\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 prototype_stm32\motor.o: ../Platform/Motor/act.h
 prototype_stm32\motor.o: ../Platform/Motor/motor.h
 prototype_stm32\motor.o: ../Core/Inc/tim.h
 prototype_stm32\motor.o: ../Platform/Motor/StepMotor.h
 prototype_stm32\motor.o: ../Platform/SERIAL_FRAME/serial_frame.h
-prototype_stm32\motor.o: D:\zrh\MDK5\ARM\ARMCC\Bin\..\include\math.h
+prototype_stm32\motor.o: C:\Users\ZEHO\AppData\Local\Keil_v5\ARM\ARMCC\Bin\..\include\math.h

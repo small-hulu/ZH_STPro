@@ -1,7 +1,7 @@
 prototype_stm32\croutine.o: ../Middlewares/Third_Party/FreeRTOS/Source/croutine.c
 prototype_stm32\croutine.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h
-prototype_stm32\croutine.o: D:\zrh\MDK5\ARM\ARMCC\Bin\..\include\stddef.h
-prototype_stm32\croutine.o: D:\zrh\MDK5\ARM\ARMCC\Bin\..\include\stdint.h
+prototype_stm32\croutine.o: C:\Users\ZEHO\AppData\Local\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
+prototype_stm32\croutine.o: C:\Users\ZEHO\AppData\Local\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 prototype_stm32\croutine.o: ../Core/Inc/FreeRTOSConfig.h
 prototype_stm32\croutine.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h
 prototype_stm32\croutine.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h

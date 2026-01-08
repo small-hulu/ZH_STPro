@@ -2,7 +2,7 @@ prototype_stm32\system_stm32f4xx.o: ../Core/Src/system_stm32f4xx.c
 prototype_stm32\system_stm32f4xx.o: ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h
 prototype_stm32\system_stm32f4xx.o: ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f407xx.h
 prototype_stm32\system_stm32f4xx.o: ../Drivers/CMSIS/Include/core_cm4.h
-prototype_stm32\system_stm32f4xx.o: D:\zrh\MDK5\ARM\ARMCC\Bin\..\include\stdint.h
+prototype_stm32\system_stm32f4xx.o: C:\Users\ZEHO\AppData\Local\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 prototype_stm32\system_stm32f4xx.o: ../Drivers/CMSIS/Include/cmsis_version.h
 prototype_stm32\system_stm32f4xx.o: ../Drivers/CMSIS/Include/cmsis_compiler.h
 prototype_stm32\system_stm32f4xx.o: ../Drivers/CMSIS/Include/cmsis_armcc.h
@@ -14,7 +14,7 @@ prototype_stm32\system_stm32f4xx.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4x
 prototype_stm32\system_stm32f4xx.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h
 prototype_stm32\system_stm32f4xx.o: ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h
 prototype_stm32\system_stm32f4xx.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h
-prototype_stm32\system_stm32f4xx.o: D:\zrh\MDK5\ARM\ARMCC\Bin\..\include\stddef.h
+prototype_stm32\system_stm32f4xx.o: C:\Users\ZEHO\AppData\Local\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
 prototype_stm32\system_stm32f4xx.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc_ex.h
 prototype_stm32\system_stm32f4xx.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio.h
 prototype_stm32\system_stm32f4xx.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio_ex.h

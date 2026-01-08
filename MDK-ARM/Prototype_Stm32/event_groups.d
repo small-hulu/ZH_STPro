@@ -1,8 +1,8 @@
 prototype_stm32\event_groups.o: ../Middlewares/Third_Party/FreeRTOS/Source/event_groups.c
-prototype_stm32\event_groups.o: D:\zrh\MDK5\ARM\ARMCC\Bin\..\include\stdlib.h
+prototype_stm32\event_groups.o: C:\Users\ZEHO\AppData\Local\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
 prototype_stm32\event_groups.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h
-prototype_stm32\event_groups.o: D:\zrh\MDK5\ARM\ARMCC\Bin\..\include\stddef.h
-prototype_stm32\event_groups.o: D:\zrh\MDK5\ARM\ARMCC\Bin\..\include\stdint.h
+prototype_stm32\event_groups.o: C:\Users\ZEHO\AppData\Local\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
+prototype_stm32\event_groups.o: C:\Users\ZEHO\AppData\Local\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 prototype_stm32\event_groups.o: ../Core/Inc/FreeRTOSConfig.h
 prototype_stm32\event_groups.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h
 prototype_stm32\event_groups.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h

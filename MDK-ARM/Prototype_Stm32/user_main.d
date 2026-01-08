@@ -1,9 +1,9 @@
 prototype_stm32\user_main.o: ..\Code\user_main.c
 prototype_stm32\user_main.o: ..\Code\user_main.h
 prototype_stm32\user_main.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h
-prototype_stm32\user_main.o: D:\zrh\MDK5\ARM\ARMCC\Bin\..\include\stdint.h
-prototype_stm32\user_main.o: D:\zrh\MDK5\ARM\ARMCC\Bin\..\include\stddef.h
-prototype_stm32\user_main.o: D:\zrh\MDK5\ARM\ARMCC\Bin\..\include\stdio.h
+prototype_stm32\user_main.o: C:\Users\ZEHO\AppData\Local\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+prototype_stm32\user_main.o: C:\Users\ZEHO\AppData\Local\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
+prototype_stm32\user_main.o: C:\Users\ZEHO\AppData\Local\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
 prototype_stm32\user_main.o: ../Core/Inc/main.h
 prototype_stm32\user_main.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h
 prototype_stm32\user_main.o: ../Core/Inc/stm32f4xx_hal_conf.h
@@ -48,8 +48,8 @@ prototype_stm32\user_main.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/
 prototype_stm32\user_main.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/list.h
 prototype_stm32\user_main.o: ../Code/user_main.h
 prototype_stm32\user_main.o: ../Platform/FSM/fsm_lib.h
-prototype_stm32\user_main.o: D:\zrh\MDK5\ARM\ARMCC\Bin\..\include\stdlib.h
-prototype_stm32\user_main.o: D:\zrh\MDK5\ARM\ARMCC\Bin\..\include\string.h
+prototype_stm32\user_main.o: C:\Users\ZEHO\AppData\Local\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
+prototype_stm32\user_main.o: C:\Users\ZEHO\AppData\Local\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 prototype_stm32\user_main.o: ../Platform/Motor/act.h
 prototype_stm32\user_main.o: ../Platform/Motor/motor.h
 prototype_stm32\user_main.o: ../Core/Inc/tim.h

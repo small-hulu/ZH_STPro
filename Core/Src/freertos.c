@@ -27,6 +27,7 @@
 /* USER CODE BEGIN Includes */
 #include "usart.h"
 #include "user_main.h"
+#include "demo.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -69,6 +70,13 @@ const osThreadAttr_t status_task_attributes = {
   .stack_size = 512 * 4,
   .priority = (osPriority_t) osPriorityLow,
 };
+/* Definitions for imuTask */
+osThreadId_t imuTaskHandle;
+const osThreadAttr_t imuTask_attributes = {
+  .name = "imuTask",
+  .stack_size = 512 * 4,
+  .priority = (osPriority_t) osPriorityAboveNormal,
+};
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -81,6 +89,7 @@ fsm_lib_ctrl_handle main_ctrl_fsm_handle;
 void StartDefaultTask(void *argument);
 void fun_ctrl_Task(void *argument);
 void Status_Task(void *argument);
+void StartImuTask(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -124,6 +133,9 @@ void MX_FREERTOS_Init(void) {
   /* creation of status_task */
   status_taskHandle = osThreadNew(Status_Task, NULL, &status_task_attributes);
 
+  /* creation of imuTask */
+  imuTaskHandle = osThreadNew(StartImuTask, NULL, &imuTask_attributes);
+
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
@@ -155,6 +167,7 @@ void StartDefaultTask(void *argument)
 
 	for (;;)
 	{	
+		  printf("\r\n******************************************\r\n");
 			if (xQueueReceive(uartQueue,&frame,portMAX_DELAY) == pdPASS)
       {
 					//Unpacking
@@ -269,6 +282,31 @@ void Status_Task(void *argument)
 		osDelay(1000);
   }
   /* USER CODE END Status_Task */
+}
+
+/* USER CODE BEGIN Header_StartImuTask */
+/**
+* @brief Function implementing the imuTask thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartImuTask */
+void StartImuTask(void *argument)
+{
+  /* USER CODE BEGIN StartImuTask */
+	uint8_t I2C_data[10];
+	demo_run();
+	//printf("%4.2f \n",Get_Acc()[2]);
+	float* acc= Get_Acc();
+	float a = acc[2];
+  /* Infinite loop */
+  for(;;)
+  {
+		
+		//demo_run();
+    osDelay(1);
+  }
+  /* USER CODE END StartImuTask */
 }
 
 /* Private application code --------------------------------------------------*/

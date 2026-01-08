@@ -1,7 +1,7 @@
 prototype_stm32\freertos.o: ../Core/Src/freertos.c
 prototype_stm32\freertos.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h
-prototype_stm32\freertos.o: D:\zrh\MDK5\ARM\ARMCC\Bin\..\include\stddef.h
-prototype_stm32\freertos.o: D:\zrh\MDK5\ARM\ARMCC\Bin\..\include\stdint.h
+prototype_stm32\freertos.o: C:\Users\ZEHO\AppData\Local\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
+prototype_stm32\freertos.o: C:\Users\ZEHO\AppData\Local\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 prototype_stm32\freertos.o: ../Core/Inc/FreeRTOSConfig.h
 prototype_stm32\freertos.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h
 prototype_stm32\freertos.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h
@@ -45,10 +45,10 @@ prototype_stm32\freertos.o: ../Core/Inc/main.h
 prototype_stm32\freertos.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/queue.h
 prototype_stm32\freertos.o: ../Code/user_main.h
 prototype_stm32\freertos.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h
-prototype_stm32\freertos.o: D:\zrh\MDK5\ARM\ARMCC\Bin\..\include\stdio.h
+prototype_stm32\freertos.o: C:\Users\ZEHO\AppData\Local\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
 prototype_stm32\freertos.o: ../Platform/FSM/fsm_lib.h
-prototype_stm32\freertos.o: D:\zrh\MDK5\ARM\ARMCC\Bin\..\include\stdlib.h
-prototype_stm32\freertos.o: D:\zrh\MDK5\ARM\ARMCC\Bin\..\include\string.h
+prototype_stm32\freertos.o: C:\Users\ZEHO\AppData\Local\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
+prototype_stm32\freertos.o: C:\Users\ZEHO\AppData\Local\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 prototype_stm32\freertos.o: ../Platform/Motor/act.h
 prototype_stm32\freertos.o: ../Platform/Motor/motor.h
 prototype_stm32\freertos.o: ../Core/Inc/usart.h
@@ -56,3 +56,4 @@ prototype_stm32\freertos.o: ../Core/Inc/tim.h
 prototype_stm32\freertos.o: ../Platform/Motor/StepMotor.h
 prototype_stm32\freertos.o: ../Platform/SERIAL_FRAME/serial_frame.h
 prototype_stm32\freertos.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os.h
+prototype_stm32\freertos.o: ../Core/Inc/demo.h

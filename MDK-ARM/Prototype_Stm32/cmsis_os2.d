@@ -1,8 +1,8 @@
 prototype_stm32\cmsis_os2.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.c
-prototype_stm32\cmsis_os2.o: D:\zrh\MDK5\ARM\ARMCC\Bin\..\include\string.h
+prototype_stm32\cmsis_os2.o: C:\Users\ZEHO\AppData\Local\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 prototype_stm32\cmsis_os2.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h
-prototype_stm32\cmsis_os2.o: D:\zrh\MDK5\ARM\ARMCC\Bin\..\include\stdint.h
-prototype_stm32\cmsis_os2.o: D:\zrh\MDK5\ARM\ARMCC\Bin\..\include\stddef.h
+prototype_stm32\cmsis_os2.o: C:\Users\ZEHO\AppData\Local\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+prototype_stm32\cmsis_os2.o: C:\Users\ZEHO\AppData\Local\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
 prototype_stm32\cmsis_os2.o: ../Drivers/CMSIS/Include/cmsis_compiler.h
 prototype_stm32\cmsis_os2.o: ../Drivers/CMSIS/Include/cmsis_armcc.h
 prototype_stm32\cmsis_os2.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h

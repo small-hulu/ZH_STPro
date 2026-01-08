@@ -1,8 +1,8 @@
 prototype_stm32\heap_4.o: ../Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c
-prototype_stm32\heap_4.o: D:\zrh\MDK5\ARM\ARMCC\Bin\..\include\stdlib.h
+prototype_stm32\heap_4.o: C:\Users\ZEHO\AppData\Local\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
 prototype_stm32\heap_4.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h
-prototype_stm32\heap_4.o: D:\zrh\MDK5\ARM\ARMCC\Bin\..\include\stddef.h
-prototype_stm32\heap_4.o: D:\zrh\MDK5\ARM\ARMCC\Bin\..\include\stdint.h
+prototype_stm32\heap_4.o: C:\Users\ZEHO\AppData\Local\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
+prototype_stm32\heap_4.o: C:\Users\ZEHO\AppData\Local\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 prototype_stm32\heap_4.o: ../Core/Inc/FreeRTOSConfig.h
 prototype_stm32\heap_4.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h
 prototype_stm32\heap_4.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h
