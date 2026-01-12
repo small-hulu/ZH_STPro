@@ -73,7 +73,7 @@ const osThreadAttr_t status_task_attributes = {
 osThreadId_t neckTaskHandle;
 const osThreadAttr_t neckTask_attributes = {
   .name = "neckTask",
-  .stack_size = 256 * 4,
+  .stack_size = 512 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
 
@@ -81,7 +81,7 @@ const osThreadAttr_t neckTask_attributes = {
 /* USER CODE BEGIN FunctionPrototypes */
 typedef struct {
     int16_t angle; 
-		int8_t  pitch_angle;  //0x01 20
+		int16_t pitch_angle;  
 } neck_cmd_t;
 
 QueueHandle_t neckQueue;
@@ -127,7 +127,7 @@ void MX_FREERTOS_Init(void) {
 	
 	uartQueue = xQueueCreate(4,sizeof(uart_frame_t));
 	configASSERT(uartQueue != NULL);
-	neckQueue = xQueueCreate(16, sizeof(neck_cmd_t)); 
+	neckQueue = xQueueCreate(8, sizeof(neck_cmd_t)); 
 	configASSERT(neckQueue != NULL);
   /* USER CODE END RTOS_QUEUES */
 
@@ -162,6 +162,7 @@ void MX_FREERTOS_Init(void) {
   */
 serial_frame_t pkt;
 cmd_vel_t cmd;
+neck_cmd_t neck_cmd;
 uint8_t  cur_cmd;
 /* USER CODE END Header_StartDefaultTask */
 void StartDefaultTask(void *argument)
@@ -230,14 +231,10 @@ void StartDefaultTask(void *argument)
 								case 0x05:
 								{
 										//ack
-										int16_t angle = (pkt.data[0] << 8) | pkt.data[1];
-										int8_t pitch_angle = (int8_t)pkt.data[3];
-										neck_cmd_t cmd = {
-																	.angle = angle,
-																	.pitch_angle = pitch_angle
-										};
-
-										xQueueSendToBack(neckQueue, &cmd, 0);
+										neck_cmd.angle       = (int16_t)((pkt.data[0] << 8) | pkt.data[1]);
+										neck_cmd.pitch_angle = (int16_t)((pkt.data[2] << 8) | pkt.data[3]);
+  
+										xQueueSendToBack(neckQueue, &neck_cmd, 0);
   
 										uint8_t ack_data[] = {0x00};
 										tx_len = serial_frame_build(0x85, ack_data, 1,tx_buf, sizeof(tx_buf));
@@ -274,36 +271,25 @@ void fun_ctrl_Task(void *argument)
 	
 	fsm_lib_start(&main_ctrl_fsm_handle);
   /* Infinite loop */
-	int16_t start_angle = 90;
+	int16_t start_angle = 70;
   int16_t end_angle   = 140;
+	int16_t pitch_start = 0;
+  int16_t pitch_end   = 60;
   neck_cmd_t cmd;
 
   for(;;)
   {
-			// ??
-        for (int16_t angle = start_angle; angle <= end_angle; angle += 2)
-        {
-            cmd.angle = angle;
-            xQueueSendToBack(neckQueue, &cmd, 0); // ?????
-            osDelay(20); // 40ms????????
-        }
+         // ??? -> ??
+//        cmd.angle       = end_angle;
+//        cmd.pitch_angle = pitch_end;
+//        xQueueSendToBack(neckQueue, &cmd, 0);
+//        osDelay(2000); // ???????
 
-        // ??
-        for (int16_t angle = end_angle; angle >= start_angle; angle -= 2)
-        {
-            cmd.angle = angle;
-            xQueueSendToBack(neckQueue, &cmd, 0);
-            osDelay(20);
-        }
-
-        osDelay(200); 
-//		fsm_lib_return ret = main_ctrl_fsm(&main_ctrl_fsm_handle);
-//		if (ret == fsm_rt_idle) {
-//        osDelay(10);
-//    } else {
-//        osDelay(1);
-//    }
-		osDelay(100);
+//        // ??? -> ??
+//        cmd.angle       = start_angle;
+//        cmd.pitch_angle = pitch_start;
+//        xQueueSendToBack(neckQueue, &cmd, 0);
+        osDelay(1000);
   }
   /* USER CODE END fun_ctrl_Task */
 }
@@ -346,14 +332,20 @@ void NeckTask(void *argument)
       if (xQueueReceive(neckQueue, &cmd, portMAX_DELAY) == pdTRUE)
       {
           Neck_R_SetTargetAngle(cmd.angle);
-
+					Neck_Pitch_SetTargetAngle(cmd.pitch_angle);
           
           last = xTaskGetTickCount();
-          while (neck_r_cur_angle != neck_r_target_angle)
-          {
-              Neck_R_Update();
-              vTaskDelayUntil(&last, pdMS_TO_TICKS(40)); 
-          }
+          while (neck_r_cur_angle != neck_r_target_angle || neck_pitch_cur != neck_pitch_target)
+					{
+							Neck_Pitch_Update(); 
+						
+							if (xQueueReceive(neckQueue, &cmd, 0) == pdTRUE)
+							{
+									Neck_R_SetTargetAngle(cmd.angle);
+									Neck_Pitch_SetTargetAngle(cmd.pitch_angle);
+							}
+							vTaskDelay(pdMS_TO_TICKS(10));
+					}
       }
   }
   /* USER CODE END NeckTask */

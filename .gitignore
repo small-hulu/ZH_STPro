@@ -1,17 +1,24 @@
-# Keil uVision 中间文件
+# ===== Keil / MDK build output =====
+MDK-ARM/Prototype_Stm32/
+MDK-ARM/DebugConfig/
+MDK-ARM/RTE/
+
+# ===== Keil user config =====
+*.uvoptx
 *.uvopt
 *.uvguix
 *.uvprojx.user
-*.bak
-*.hex
-*.axf
+
+# ===== Build outputs =====
 *.o
 *.a
 *.d
 *.elf
+*.axf
+*.hex
+*.bin
 *.map
 *.lst
-*.bin
 *.srec
 *.log
 *.crf
@@ -20,8 +27,10 @@
 *.sct
 *.dep
 
-# 临时文件
+# ===== CubeMX temp =====
+*.bak
 *.tmp
-*.swp
-*.DS_Store
-*.uvoptx
+
+# ===== OS =====
+.DS_Store
+Thumbs.db

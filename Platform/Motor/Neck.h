@@ -31,8 +31,26 @@
 #define INC_NECK_H_
 
 #include "stm32f4xx_hal.h"
+
+#ifndef CLAMP
+#define CLAMP(x, min, max)  ((x) < (min) ? (min) : ((x) > (max) ? (max) : (x)))
+#endif
+
 extern int16_t neck_r_cur_angle;
 extern int16_t neck_r_target_angle;
+extern int16_t neck_pitch_cur;    
+extern int16_t neck_pitch_target;  
+
+extern uint16_t neck1_ccr;
+extern uint16_t neck2_ccr;
+extern uint16_t neck3_ccr;
+
+typedef enum {
+    NECK_PITCH_0   = 0,
+    NECK_PITCH_20  = 20,
+    NECK_PITCH_40  = 40,
+    NECK_PITCH_60  = 60,
+} neck_pitch_t;
 #define NECK_1_MIN 75
 #define NECK_1_MID 120
 #define NECK_1_MAX 140
@@ -64,5 +82,7 @@ void Neckinit();
 uint16_t neck_angle_to_ccr(int16_t angle);
 void Neck_R_SetTargetAngle(int16_t angle);
 void Neck_R_Update(void);
+void Neck_Pitch_Update(void);
+void Neck_Pitch_SetTargetAngle(int16_t angle);
 #endif
 /* USER CODE END */

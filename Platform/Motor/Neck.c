@@ -64,6 +64,48 @@ void NeckTwist(uint8_t Angle)
   */
 int16_t neck_r_cur_angle = 90; 
 int16_t neck_r_target_angle = 90;
+
+int16_t neck_pitch_cur = 0;      // 当前俯仰角
+int16_t neck_pitch_target = 0;   // 目标俯仰角
+
+uint16_t neck1_ccr = 100;
+uint16_t neck2_ccr = 100;
+uint16_t neck3_ccr = 100;
+void Neck_Pitch_SetTargetAngle(int16_t angle)
+{
+    /* 逻辑角度限幅：0~60° */
+    if (angle < 0)  angle = 0;
+    if (angle > 60) angle = 60;
+
+    neck_pitch_target = angle;
+}
+void Neck_Pitch_Update(void)
+{
+    // 水平角更新
+    if (neck_r_cur_angle < neck_r_target_angle)
+        neck_r_cur_angle++;
+    else if (neck_r_cur_angle > neck_r_target_angle)
+        neck_r_cur_angle--;
+
+    // 俯仰角更新
+    if (neck_pitch_cur < neck_pitch_target)
+        neck_pitch_cur++;
+    else if (neck_pitch_cur > neck_pitch_target)
+        neck_pitch_cur--;
+
+    // 水平舵机 PWM
+    uint16_t r_ccr = neck_angle_to_ccr(neck_r_cur_angle);
+
+    neck1_ccr = CLAMP(100 + neck_pitch_cur, NECK_1_MIN, NECK_1_MAX);
+    neck2_ccr = CLAMP(100 - neck_pitch_cur, NECK_2_MIN, NECK_2_MAX);
+    neck3_ccr = CLAMP(100 + neck_pitch_cur, NECK_3_MIN, NECK_3_MAX);
+
+    __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, r_ccr);  // 水平
+    __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, neck1_ccr);
+    __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_3, neck2_ccr);
+    __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_4, neck3_ccr);
+}
+
 void TestNod()
 {
 	Neck_R_SetTargetAngle(120);
@@ -158,6 +200,7 @@ void Neck_R_SetTargetAngle(int16_t angle)
 
     neck_r_target_angle = angle;
 }
+
 void Neck_R_Update(void)
 {
     if (neck_r_cur_angle == neck_r_target_angle)
@@ -171,6 +214,7 @@ void Neck_R_Update(void)
     uint16_t ccr = neck_angle_to_ccr(neck_r_cur_angle);
     __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, ccr);
 }
+
 
 /* USER CODE END */
 #endif
