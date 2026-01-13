@@ -10,14 +10,10 @@
 #include "tim.h"
 #include <math.h>
 
-
-
-
 MotorFeedback_t fb1, fb2;
 /**********************************************************轮毂电机控制*********************************************************/
 /************************初始化**********************/
 void Car_Init(){
-	/* 初始化电机模块*/
 	Motor_Init(&huart2);
 
 	//第一次开启 DMA+IDLE 接收
@@ -82,15 +78,12 @@ float v_left,v_right;
 
 void Motor_SetSpeed_FromCmd(const cmd_vel_t *cmd, uint8_t acc)
 {
-    // 单位换算 mm/s -> m/s, mrad/s -> rad/s
     float linear_x_m_s = cmd->linear_x_mm_s / 1000.0f;
     float angular_z_rad_s = cmd->angular_z_mrad / 1000.0f;
 
-    // 差速轮速度 (m/s)
     v_left  = linear_x_m_s - angular_z_rad_s * (WHEEL_BASE_M / 2.0f);
     v_right = linear_x_m_s + angular_z_rad_s * (WHEEL_BASE_M / 2.0f);
 
-    // 转为 RPM
     rpm_l = (int16_t)(v_left  * MS_TO_RPM) *10;
     rpm_r = (-(int16_t)(v_right * MS_TO_RPM)) * 10;
 

@@ -8,7 +8,7 @@ static uint8_t serial_frame_calc_checksum(const uint8_t *buf, uint16_t len)
     uint8_t cs = 0;
     for (uint16_t i = 0; i < len + 1; i++)
     {
-        cs ^= buf[i];   // ★ XOR，不是 +
+        cs ^= buf[i];   
     }
     return cs;
 }
@@ -22,35 +22,29 @@ serial_frame_ret_t serial_frame_parse(
     if (raw == NULL || out == NULL)
         return SERIAL_FRAME_ERR_FORMAT;
 
-    /* 最小帧：AA Len Cmd CS 0D (N = 0) */
     if (raw_len < 5)
         return SERIAL_FRAME_ERR_LEN;
 
-    /* 帧头 */
     if (raw[0] != SERIAL_FRAME_HEAD)
         return SERIAL_FRAME_ERR_HEAD;
 
-    /* 帧尾 */
     if (raw[raw_len - 1] != SERIAL_FRAME_TAIL)
         return SERIAL_FRAME_ERR_TAIL;
 
-    uint8_t len = raw[1];   /* = Command(1) + Data(N) */
+    uint8_t len = raw[1];   
 
     if (len < 1 || len > (SERIAL_FRAME_MAX_DATA_LEN + 1))
         return SERIAL_FRAME_ERR_LEN;
 
-    /* AA + Len + (Cmd+Data) + CS + 0D = len + 4 */
     if (raw_len != (uint16_t)(len + 4))
         return SERIAL_FRAME_ERR_LEN;
 
-    /* ★ 只校验 Length + Command + Data */
     uint8_t calc = serial_frame_calc_checksum(&raw[1], len);
     uint8_t recv = raw[raw_len - 2];   // checksum
 
     if (calc != recv)
         return SERIAL_FRAME_ERR_CHECKSUM;
 
-    /* 拆包 */
     out->cmd = raw[2];
     out->data_len = len - 1;
 
@@ -84,7 +78,6 @@ uint16_t serial_frame_build(
         memcpy(&out_buf[3], data, data_len);
     }
 
-    /* checksum = sum(CMD + DATA) */
     uint8_t chk = 0;
     chk += cmd;
     for (uint8_t i = 0; i < data_len; i++)

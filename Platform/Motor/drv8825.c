@@ -15,7 +15,6 @@
 void DRV8825_Init(DRV8825_MicroStepTypeDef microstep) {
     GPIO_InitTypeDef GPIO_InitStruct = {0};
 
-    // 使能GPIO时钟（根据实际引脚修改）
     __HAL_RCC_GPIOA_CLK_ENABLE();
 
     // 配置控制引脚为推挽输出
@@ -24,10 +23,9 @@ void DRV8825_Init(DRV8825_MicroStepTypeDef microstep) {
                           DRV8825_MS1_Pin | DRV8825_MS2_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;  // 步进信号需较高速度
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH; 
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-    // 初始状态：禁用驱动，步进信号拉低
 		HAL_GPIO_WritePin(DRV8825_EN_GPIO_Port, DRV8825_EN_Pin, GPIO_PIN_SET);
     DISABLE_8825;
     STEP_LOW;

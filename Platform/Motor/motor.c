@@ -124,7 +124,7 @@ void Motor_ProcessRxData(uint8_t *buf, uint16_t len)
         parse_frame(&buf[i]);
     }
 
-    /* 在这里清零最合理！ */
+   
     xUART2.RxNum = 0;
 }
 
