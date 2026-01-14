@@ -23,7 +23,8 @@
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
-
+#include "../Platform/IMU/delay.h"
+#include "demo.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "user_main.h"
@@ -116,6 +117,7 @@ int main(void)
 	Car_Init();
 	//printf("this is stm32f407\r\n");
 	Stepper_Init();
+	delay_init();
 	//TurnLeft();
   /* USER CODE END 2 */
 
