@@ -76,7 +76,7 @@ const osThreadAttr_t status_task_attributes = {
 osThreadId_t neckTaskHandle;
 const osThreadAttr_t neckTask_attributes = {
   .name = "neckTask",
-  .stack_size = 128 * 4,
+  .stack_size = 512 * 4,
   .priority = (osPriority_t) osPriorityLow,
 };
 
@@ -172,7 +172,6 @@ void StartDefaultTask(void *argument)
 {
   /* USER CODE BEGIN StartDefaultTask */
   /* Infinite loop */
-	//printf("StartDefaultTask\r\n");
   uint16_t rx_len;
 	uart_frame_t frame;
 	uint8_t tx_buf[32];
@@ -281,6 +280,7 @@ void fun_ctrl_Task(void *argument)
   int16_t pitch_end   = 60;
   neck_cmd_t cmd;
 	Stop();
+	//GoAhead();
 	ArmUpDown();
   for(;;)
   {
@@ -330,6 +330,7 @@ void Status_Task(void *argument)
   for(;;)
   {
 		//touch senior  todo
+		
 		HAL_GPIO_TogglePin(GPIOF,GPIO_PIN_10);
 		
 		
@@ -402,7 +403,7 @@ void NeckTask(void *argument)
 									Neck_R_SetTargetAngle(cmd.angle);
 									Neck_Pitch_SetTargetAngle(cmd.pitch_angle);
 							}
-							vTaskDelay(pdMS_TO_TICKS(15));
+							vTaskDelay(pdMS_TO_TICKS(25));
 					}
       }
   }

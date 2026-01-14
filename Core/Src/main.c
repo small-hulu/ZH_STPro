@@ -114,11 +114,12 @@ int main(void)
   if (HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_2) != HAL_OK) { Error_Handler(); }
   if (HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_3) != HAL_OK) { Error_Handler(); }
   if (HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_4) != HAL_OK) { Error_Handler(); }
-	Car_Init();
-	//printf("this is stm32f407\r\n");
+	
 	Stepper_Init();
 	delay_init();
 	//TurnLeft();
+	HAL_Delay(3000);
+	Car_Init();
 	//demo_run();
   /* USER CODE END 2 */
 
@@ -134,6 +135,7 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 	user_main();
+	
   while (1)
   {
     /* USER CODE END WHILE */
