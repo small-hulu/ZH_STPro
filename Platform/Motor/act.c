@@ -93,23 +93,156 @@ void Motor_SetSpeed_FromCmd(const cmd_vel_t *cmd, uint8_t acc)
 }
 
 /**********************************************************翅膀电机控制*********************************************************/
-void ArmWave()
+void ArmWave()//挥手
 {
-	Stepper_SetSpeed(8);
-	Stepper_RotateAngle1(15, STEPPER_BACKWARD);//左翅中摆动
-	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, 2000);//右翅尖摆动
-	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_2, 1000);
-	osDelay(100);
-	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, 2000);//右翅尖摆动
-	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_2, 2000);
-	osDelay(250);
+	Stepper_SetSpeed(5);
+
+	Stepper_RotateAngle1(15, STEPPER_BACKWARD);//翅中摆动
+	Stepper_RotateAngle2(15, STEPPER_FORWARD);//翅中摆动
+	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, 1000);//左翅尖摆动
+	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, 2000);
 	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, 1000);//右翅尖摆动
 	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_2, 2000);
-	osDelay(100);
+	osDelay(200);
+	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, 2000);//左翅尖摆动
+	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, 2000);
 	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, 2000);//右翅尖摆动
 	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_2, 2000);
 	osDelay(200);
-	Stepper_RotateAngle1(15, STEPPER_FORWARD);//左翅中摆动
+	Stepper_RotateAngle1(30, STEPPER_FORWARD);//翅中摆动
+	Stepper_RotateAngle2(30, STEPPER_BACKWARD);//翅中摆动
+	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, 2000);//左翅尖摆动
+	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, 1000);
+	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, 2000);//右翅尖摆动
+	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_2, 1000);
+	osDelay(200);
+	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, 2000);//左翅尖摆动
+	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, 2000);
+	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, 2000);//右翅尖摆动
+	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_2, 2000);
+	osDelay(200);
+	Stepper_RotateAngle1(30, STEPPER_BACKWARD);//翅中摆动
+	Stepper_RotateAngle2(30, STEPPER_FORWARD);//翅中摆动
+	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, 1000);//左翅尖摆动
+	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, 2000);
+	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, 1000);//右翅尖摆动
+	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_2, 2000);
+	osDelay(200);
+	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, 2000);//左翅尖摆动
+	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, 2000);
+	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, 2000);//右翅尖摆动
+	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_2, 2000);
+	osDelay(200);
+	Stepper_RotateAngle1(15, STEPPER_FORWARD);//翅中摆动
+	Stepper_RotateAngle2(15, STEPPER_BACKWARD);//翅中摆动
+	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, 2000);//左翅尖摆动
+	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, 1000);
+	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, 2000);//右翅尖摆动
+	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_2, 1000);
+	osDelay(200);
+	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, 2000);//左翅尖摆动
+	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, 2000);
+	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, 2000);//右翅尖摆动
+	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_2, 2000);
+	osDelay(200);
+}
+void ArmGive()//伸手
+{
+	Stepper_SetSpeed(5);
+	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_3, 1000);//左翅根摆动
+	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_4, 0);
+	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_3, 1000);//右翅根摆动
+	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_4, 0);
+	osDelay(400);
+	Stepper_RotateAngle1(15, STEPPER_BACKWARD);//翅中摆动
+	Stepper_RotateAngle2(15, STEPPER_FORWARD);//翅中摆动
+	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, 1000);//左翅尖摆动
+	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, 2000);
+	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, 1000);//右翅尖摆动
+	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_2, 2000);
+	osDelay(200);
+	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, 2000);//左翅尖摆动
+	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, 2000);
+	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, 2000);//右翅尖摆动
+	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_2, 2000);
+	osDelay(200);
+	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, 2000);//左翅尖摆动
+	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, 1000);
+	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, 2000);//右翅尖摆动
+	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_2, 1000);
+	osDelay(200);
+	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, 2000);//左翅尖摆动
+	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, 2000);
+	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, 2000);//右翅尖摆动
+	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_2, 2000);
+	osDelay(200);
+	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, 1000);//左翅尖摆动
+	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, 2000);
+	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, 1000);//右翅尖摆动
+	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_2, 2000);
+	osDelay(200);
+	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, 2000);//左翅尖摆动
+	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, 2000);
+	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, 2000);//右翅尖摆动
+	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_2, 2000);
+	osDelay(200);
+	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, 2000);//左翅尖摆动
+	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, 1000);
+	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, 2000);//右翅尖摆动
+	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_2, 1000);
+	osDelay(200);
+	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, 2000);//左翅尖摆动
+	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, 2000);
+	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, 2000);//右翅尖摆动
+	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_2, 2000);
+	osDelay(200);
+}
+void ArmRaise()//举手
+{
+	Stepper_SetSpeed(5);
+
+	Stepper_RotateAngle1(15, STEPPER_BACKWARD);//翅中摆动
+	Stepper_RotateAngle2(15, STEPPER_FORWARD);//翅中摆动
+	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, 1000);//左翅尖摆动
+	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, 2000);
+	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, 1000);//右翅尖摆动
+	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_2, 2000);
+	osDelay(200);
+	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, 2000);//左翅尖摆动
+	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, 2000);
+	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, 2000);//右翅尖摆动
+	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_2, 2000);
+	osDelay(200);
+	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, 2000);//左翅尖摆动
+	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, 1000);
+	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, 2000);//右翅尖摆动
+	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_2, 1000);
+	osDelay(200);
+	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, 2000);//左翅尖摆动
+	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, 2000);
+	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, 2000);//右翅尖摆动
+	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_2, 2000);
+	osDelay(200);
+	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, 1000);//左翅尖摆动
+	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, 2000);
+	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, 1000);//右翅尖摆动
+	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_2, 2000);
+	osDelay(200);
+	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, 2000);//左翅尖摆动
+	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, 2000);
+	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, 2000);//右翅尖摆动
+	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_2, 2000);
+	osDelay(200);
+	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, 2000);//左翅尖摆动
+	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, 1000);
+	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, 2000);//右翅尖摆动
+	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_2, 1000);
+	osDelay(200);
+	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, 2000);//左翅尖摆动
+	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, 2000);
+	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, 2000);//右翅尖摆动
+	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_2, 2000);
+	osDelay(200);
 }
 /*************************上下扑棱***************************/
 void ArmUpDown(){
