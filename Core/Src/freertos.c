@@ -277,6 +277,7 @@ void fun_ctrl_Task(void *argument)
   int16_t pitch_end   = 60;
   neck_cmd_t cmd;
 	Stop();
+	//GoAhead();
 	ArmUpDown();
   for(;;)
   {
@@ -345,7 +346,7 @@ void NeckTask(void *argument)
 									Neck_R_SetTargetAngle(cmd.angle);
 									Neck_Pitch_SetTargetAngle(cmd.pitch_angle);
 							}
-							vTaskDelay(pdMS_TO_TICKS(15));
+							vTaskDelay(pdMS_TO_TICKS(25));
 					}
       }
   }
