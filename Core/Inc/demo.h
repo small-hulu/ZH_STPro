@@ -21,9 +21,24 @@
 #ifndef __DEMO_H
 #define __DEMO_H
 
+#include "../Platform/IMU/atk_ms6dsv.h"
+#include "./usart.h"
+#include "../Platform/IMU/delay.h"
 void demo_run(void);
 
-float* Get_Acc(void);
-float* Get_Ang(void);
-float Get_Acc_z(void);
+//float* Get_Acc(void);
+//float* Get_Ang(void);
+//float Get_Acc_z(void);
+//uint8_t ret;
+//lsm6dsv16x_filt_settling_mask_t filt_settling_mask;
+//lsm6dsv16x_data_ready_t drdy;
+//int16_t data_raw_acceleration[3];
+//int16_t data_raw_angular_rate[3];
+//int16_t data_raw_temperature;
+//    
+//uint8_t i2ctimes;
+//		
+//float acceleration_mg[3];
+//float angular_rate_mdps[3];
+
 #endif

@@ -27,6 +27,9 @@
 /* USER CODE BEGIN Includes */
 #include "usart.h"
 #include "user_main.h"
+#include "demo.h"
+#include "../Platform/IMU/lsm6dsv16x_reg.h"
+#include "../Platform/IMU/atk_ms6dsv.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -174,6 +177,7 @@ void StartDefaultTask(void *argument)
 	uint8_t tx_buf[32];
 	uint16_t tx_len;
 
+
 	for (;;)
 	{	
 			if (xQueueReceive(uartQueue,&frame,portMAX_DELAY) == pdPASS)
@@ -305,13 +309,66 @@ void fun_ctrl_Task(void *argument)
 void Status_Task(void *argument)
 {
   /* USER CODE BEGIN Status_Task */
+		uint8_t ret;
+  ret = atk_ms6dsv_init();
+	float* Get_Acc(void);
+	float* Get_Ang(void);
+	float Get_Acc_z(void);
+	
+	lsm6dsv16x_filt_settling_mask_t filt_settling_mask;
+	lsm6dsv16x_data_ready_t drdy;
+	int16_t data_raw_acceleration[3];
+	int16_t data_raw_angular_rate[3];
+	int16_t data_raw_temperature;
+    
+	uint8_t i2ctimes;
+		
+	float acceleration_mg[3];
+	float angular_rate_mdps[3];
+
   /* Infinite loop */
   for(;;)
   {
 		//touch senior  todo
 		
 		HAL_GPIO_TogglePin(GPIOF,GPIO_PIN_10);
-		osDelay(1000);
+		
+		
+		  /* 获取数据就绪状态 */
+        lsm6dsv16x_flag_data_ready_get(&atk_ms6dsv, &drdy);
+        
+        /* 加速度数据就绪 */
+        if (drdy.drdy_xl)
+        {
+            lsm6dsv16x_acceleration_raw_get(&atk_ms6dsv, data_raw_acceleration);
+            acceleration_mg[0] = lsm6dsv16x_from_fs2_to_mg(data_raw_acceleration[0]);
+            acceleration_mg[1] = lsm6dsv16x_from_fs2_to_mg(data_raw_acceleration[1]);
+            acceleration_mg[2] = lsm6dsv16x_from_fs2_to_mg(data_raw_acceleration[2]);
+        }
+        
+        /* 角速度数据就绪 */
+        if (drdy.drdy_gy)
+        {
+            lsm6dsv16x_angular_rate_raw_get(&atk_ms6dsv, data_raw_angular_rate);
+            angular_rate_mdps[0] = lsm6dsv16x_from_fs2000_to_mdps(data_raw_angular_rate[0]);
+            angular_rate_mdps[1] = lsm6dsv16x_from_fs2000_to_mdps(data_raw_angular_rate[1]);
+            angular_rate_mdps[2] = lsm6dsv16x_from_fs2000_to_mdps(data_raw_angular_rate[2]);
+        }
+        
+        if (++i2ctimes == 20)
+        {
+            i2ctimes = 0;
+           // printf("\r\n******************************************\r\n");
+          //printf("Acceleration[mg]: %4.2f %4.2f %4.2f\r\n", acceleration_mg[0], acceleration_mg[1], acceleration_mg[2]);
+					printf("%4.2f \n",acceleration_mg[2]/1000);
+            //printf("Angular rate[mdps]: %4.2f %4.2f %4.2f\r\n", angular_rate_mdps[0], angular_rate_mdps[1], angular_rate_mdps[2]);
+            //printf("Temperature[degC]: %6.2f\r\n", temperature_degc);
+        }
+        
+        osDelay(10);
+				
+				
+		//osDelay(1000);
   }
   /* USER CODE END Status_Task */
 }
