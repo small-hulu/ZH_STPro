@@ -24,7 +24,7 @@
 #include "usart.h"
 #include "gpio.h"
 #include "../Platform/IMU/delay.h"
-#include "demo.h"
+//#include "demo.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "user_main.h"
@@ -119,6 +119,7 @@ int main(void)
 	Stepper_Init();
 	delay_init();
 	//TurnLeft();
+	//demo_run();
   /* USER CODE END 2 */
 
   /* Init scheduler */
