@@ -209,7 +209,7 @@ void StartDefaultTask(void *argument)
                 
                 case 0x02:
 								{
-									  ArmFrontBack();
+									  ArmGive();
 										uint8_t ack_data[] = {0x00};
 										tx_len = serial_frame_build(0x82, ack_data, 1,tx_buf, sizeof(tx_buf));
 										HAL_UART_Transmit(&huart6, tx_buf, tx_len, 100);
@@ -217,7 +217,7 @@ void StartDefaultTask(void *argument)
 								}   
 								case 0x03:
 								{
-										//ack
+										ArmWave();
 										uint8_t ack_data[] = {0x00};
 										tx_len = serial_frame_build(0x83, ack_data, 1,tx_buf, sizeof(tx_buf));
 										HAL_UART_Transmit(&huart6, tx_buf, tx_len, 100);
@@ -225,7 +225,7 @@ void StartDefaultTask(void *argument)
 								}
                 case 0x04:
 								{
-										//ack
+										ArmRaise();
 										uint8_t ack_data[] = {0x00};
 										tx_len = serial_frame_build(0x84, ack_data, 1,tx_buf, sizeof(tx_buf));
 										HAL_UART_Transmit(&huart6, tx_buf, tx_len, 100);
