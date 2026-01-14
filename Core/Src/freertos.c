@@ -309,12 +309,18 @@ void fun_ctrl_Task(void *argument)
 void Status_Task(void *argument)
 {
   /* USER CODE BEGIN Status_Task */
-		uint8_t ret;
+	uint8_t ret;
   ret = atk_ms6dsv_init();
-	float* Get_Acc(void);
-	float* Get_Ang(void);
-	float Get_Acc_z(void);
-	
+	//    ret = atk_ms6dsv_init();
+    if (ret != 0)
+    {
+        printf("ATK-MS6DSV init failed!\r\n");
+        while (1)
+        {
+            //LED0_TOGGLE();
+       osDelay(200);
+        }
+    }
 	lsm6dsv16x_filt_settling_mask_t filt_settling_mask;
 	lsm6dsv16x_data_ready_t drdy;
 	int16_t data_raw_acceleration[3];
@@ -325,7 +331,23 @@ void Status_Task(void *argument)
 		
 	float acceleration_mg[3];
 	float angular_rate_mdps[3];
-
+/* 配置加速度计和陀螺仪的ODR */
+    lsm6dsv16x_xl_data_rate_set(&atk_ms6dsv, LSM6DSV16X_ODR_AT_60Hz);
+    lsm6dsv16x_gy_data_rate_set(&atk_ms6dsv, LSM6DSV16X_ODR_AT_60Hz);
+    
+    /* 配置加速度计和陀螺仪的量程 */
+    lsm6dsv16x_xl_full_scale_set(&atk_ms6dsv, LSM6DSV16X_2g);
+    lsm6dsv16x_gy_full_scale_set(&atk_ms6dsv, LSM6DSV16X_2000dps);
+    
+    /* 配置滤波器 */
+    filt_settling_mask.drdy = PROPERTY_ENABLE;
+    filt_settling_mask.irq_xl = PROPERTY_ENABLE;
+    filt_settling_mask.irq_g = PROPERTY_ENABLE;
+    lsm6dsv16x_filt_settling_mask_set(&atk_ms6dsv, filt_settling_mask);
+    lsm6dsv16x_filt_gy_lp1_set(&atk_ms6dsv, PROPERTY_ENABLE);
+    lsm6dsv16x_filt_gy_lp1_bandwidth_set(&atk_ms6dsv, LSM6DSV16X_GY_ULTRA_LIGHT);
+    lsm6dsv16x_filt_xl_lp2_set(&atk_ms6dsv, PROPERTY_ENABLE);
+    lsm6dsv16x_filt_xl_lp2_bandwidth_set(&atk_ms6dsv, LSM6DSV16X_XL_STRONG);
   /* Infinite loop */
   for(;;)
   {
