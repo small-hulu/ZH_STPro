@@ -57,6 +57,10 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define sda_Pin GPIO_PIN_6
+#define sda_GPIO_Port GPIOB
+#define scl_Pin GPIO_PIN_7
+#define scl_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 #define ARRAY_LENGTH(arr)  (sizeof(arr) / sizeof((arr)[0]))

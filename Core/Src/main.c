@@ -23,7 +23,8 @@
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
-
+#include "../Platform/IMU/delay.h"
+#include "demo.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "user_main.h"
@@ -115,6 +116,7 @@ int main(void)
   if (HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_4) != HAL_OK) { Error_Handler(); }
 	
 	Stepper_Init();
+	delay_init();
 	//TurnLeft();
 	HAL_Delay(3000);
 	Car_Init();
