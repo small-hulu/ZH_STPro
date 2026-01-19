@@ -189,8 +189,7 @@ void StartDefaultTask(void *argument)
 	uart_frame_t frame;
 	uint8_t tx_buf[32];
 	uint16_t tx_len;
-
-
+	//test git 
 	for (;;)
 	{	
 			if (xQueueReceive(uartQueue,&frame,portMAX_DELAY) == pdPASS)
