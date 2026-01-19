@@ -158,17 +158,17 @@ void NeckNod()
 
 void NeckUpDown()
 {
-	for(uint8_t i=0;i<=30;i++){
-		__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 100-i);
-		__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_3, 100-i);
-		__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_4, 100-i);
-		HAL_Delay(20);
+	for(uint8_t i=0;i<=15;i++){
+		__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 95-i);
+		__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_3, 90-i*2/3);
+		__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_4, 95-i);
+		HAL_Delay(50);
 	}
-	for(int i=0;i<=30;i++){
-		__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 70+i);
-		__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_3, 70+i);
-		__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_4, 70+i);
-		HAL_Delay(20);
+	for(int i=0;i<=15;i++){
+		__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 80+i);
+		__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_3, 80+i*2/3);
+		__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_4, 80+i);
+		HAL_Delay(50);
 	}
 }
 void NeckShow(){
