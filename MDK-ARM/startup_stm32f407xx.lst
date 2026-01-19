@@ -849,7 +849,7 @@ interwork --depend=prototype_stm32\startup_stm32f407xx.d -oprototype_stm32\star
 ARM Macro Assembler    Page 14 
 
 
-tup_stm32f407xx.o -I../Drivers/CMSIS/Include -I.\RTE\_Prototype_Stm32 -ID:\User
+tup_stm32f407xx.o -I../Drivers/CMSIS/Include -I.\RTE\_Prototype_Stm32 -IC:\User
 s\ZEHO\AppData\Local\Arm\Packs\ARM\CMSIS\6.1.0\CMSIS\Core\Include --predefine="
 __UVISION_VERSION SETA 540" --predefine="STM32F407xx SETA 1" --predefine="_RTE_
  SETA 1" --list=startup_stm32f407xx.lst startup_stm32f407xx.s
