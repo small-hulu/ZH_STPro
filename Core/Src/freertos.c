@@ -81,13 +81,6 @@ const osThreadAttr_t neckTask_attributes = {
   .stack_size = 512 * 4,
   .priority = (osPriority_t) osPriorityLow,
 };
-/* Definitions for WatchDogTask */
-osThreadId_t WatchDogTaskHandle;
-const osThreadAttr_t WatchDogTask_attributes = {
-  .name = "WatchDogTask",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityLow,
-};
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -107,7 +100,6 @@ void StartDefaultTask(void *argument);
 void fun_ctrl_Task(void *argument);
 void Status_Task(void *argument);
 void NeckTask(void *argument);
-void StartTask05(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -156,9 +148,6 @@ void MX_FREERTOS_Init(void) {
 
   /* creation of neckTask */
   neckTaskHandle = osThreadNew(NeckTask, NULL, &neckTask_attributes);
-
-  /* creation of WatchDogTask */
-  WatchDogTaskHandle = osThreadNew(StartTask05, NULL, &WatchDogTask_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -366,21 +355,17 @@ void fun_ctrl_Task(void *argument)
 void Status_Task(void *argument)
 {
   /* USER CODE BEGIN Status_Task */
-
+	uint32_t last_led_tick = 0;
+	
   ret = atk_ms6dsv_init();
-	//    ret = atk_ms6dsv_init();
-    if (ret != 0)
-    {
-        printf("ATK-MS6DSV init failed!\r\n");
-        while (1)
-        {
-            //LED0_TOGGLE();
-       osDelay(200);
-        }
-    }
+  if (ret != 0)
+  {
+      printf("ATK-MS6DSV init failed!\r\n");
+		  osDelay(200);
+  }
+	
 	lsm6dsv16x_filt_settling_mask_t filt_settling_mask;
 	lsm6dsv16x_data_ready_t drdy;
-
 	uint8_t imu_data[12];
 	int16_t data_raw_temperature;
     
@@ -388,98 +373,83 @@ void Status_Task(void *argument)
 		
 	float acceleration_mg[3];
 	float angular_rate_mdps[3];
-/* ���ü��ٶȼƺ������ǵ�ODR */
-    lsm6dsv16x_xl_data_rate_set(&atk_ms6dsv, LSM6DSV16X_ODR_AT_60Hz);
-    lsm6dsv16x_gy_data_rate_set(&atk_ms6dsv, LSM6DSV16X_ODR_AT_60Hz);
+  lsm6dsv16x_xl_data_rate_set(&atk_ms6dsv, LSM6DSV16X_ODR_AT_60Hz);
+  lsm6dsv16x_gy_data_rate_set(&atk_ms6dsv, LSM6DSV16X_ODR_AT_60Hz);
     
-    /* ���ü��ٶȼƺ������ǵ����� */
-    lsm6dsv16x_xl_full_scale_set(&atk_ms6dsv, LSM6DSV16X_2g);
-    lsm6dsv16x_gy_full_scale_set(&atk_ms6dsv, LSM6DSV16X_2000dps);
+  lsm6dsv16x_xl_full_scale_set(&atk_ms6dsv, LSM6DSV16X_2g);
+  lsm6dsv16x_gy_full_scale_set(&atk_ms6dsv, LSM6DSV16X_2000dps);
     
-    /* �����˲��� */
-    filt_settling_mask.drdy = PROPERTY_ENABLE;
-    filt_settling_mask.irq_xl = PROPERTY_ENABLE;
-    filt_settling_mask.irq_g = PROPERTY_ENABLE;
-    lsm6dsv16x_filt_settling_mask_set(&atk_ms6dsv, filt_settling_mask);
-    lsm6dsv16x_filt_gy_lp1_set(&atk_ms6dsv, PROPERTY_ENABLE);
-    lsm6dsv16x_filt_gy_lp1_bandwidth_set(&atk_ms6dsv, LSM6DSV16X_GY_ULTRA_LIGHT);
-    lsm6dsv16x_filt_xl_lp2_set(&atk_ms6dsv, PROPERTY_ENABLE);
-    lsm6dsv16x_filt_xl_lp2_bandwidth_set(&atk_ms6dsv, LSM6DSV16X_XL_STRONG);
-		uint8_t tx_buf[64];
-		uint16_t tx_len;
+  filt_settling_mask.drdy = PROPERTY_ENABLE;
+  filt_settling_mask.irq_xl = PROPERTY_ENABLE;
+  filt_settling_mask.irq_g = PROPERTY_ENABLE;
+  lsm6dsv16x_filt_settling_mask_set(&atk_ms6dsv, filt_settling_mask);
+  lsm6dsv16x_filt_gy_lp1_set(&atk_ms6dsv, PROPERTY_ENABLE);
+  lsm6dsv16x_filt_gy_lp1_bandwidth_set(&atk_ms6dsv, LSM6DSV16X_GY_ULTRA_LIGHT);
+  lsm6dsv16x_filt_xl_lp2_set(&atk_ms6dsv, PROPERTY_ENABLE);
+  lsm6dsv16x_filt_xl_lp2_bandwidth_set(&atk_ms6dsv, LSM6DSV16X_XL_STRONG);
+	uint8_t tx_buf[64];
+	uint16_t tx_len;
   /* Infinite loop */
   for(;;)
   {
 		//touch senior  todo
-		
-		HAL_GPIO_TogglePin(GPIOF,GPIO_PIN_10);
-		
-		
-		  /* ��ȡ���ݾ���״̬ */
-        lsm6dsv16x_flag_data_ready_get(&atk_ms6dsv, &drdy);
-        
-        /* ���ٶ����ݾ��� */
-        if (drdy.drdy_xl)
-        {
-            lsm6dsv16x_acceleration_raw_get(&atk_ms6dsv, data_raw_acceleration);
-            acceleration_mg[0] = lsm6dsv16x_from_fs2_to_mg(data_raw_acceleration[0]);
-            acceleration_mg[1] = lsm6dsv16x_from_fs2_to_mg(data_raw_acceleration[1]);
-            acceleration_mg[2] = lsm6dsv16x_from_fs2_to_mg(data_raw_acceleration[2]);
-        }
-        
-        /* ���ٶ����ݾ��� */
-        if (drdy.drdy_gy)
-        {
-            lsm6dsv16x_angular_rate_raw_get(&atk_ms6dsv, data_raw_angular_rate);
-            angular_rate_mdps[0] = lsm6dsv16x_from_fs2000_to_mdps(data_raw_angular_rate[0]);
-            angular_rate_mdps[1] = lsm6dsv16x_from_fs2000_to_mdps(data_raw_angular_rate[1]);
-            angular_rate_mdps[2] = lsm6dsv16x_from_fs2000_to_mdps(data_raw_angular_rate[2]);
-        }
-        
-        if (++i2ctimes == 20)
-        {
-            i2ctimes = 0;
-					int16_t ax =(int16_t)acceleration_mg[0];
-					int16_t ay =(int16_t)acceleration_mg[1];
-					int16_t az =(int16_t)acceleration_mg[2];
-					int16_t gx = (int16_t)angular_rate_mdps[0];
-					int16_t gy = (int16_t)angular_rate_mdps[1];
-					int16_t gz = (int16_t)angular_rate_mdps[2];
-					imu_data[0] = ax>>8;
-					imu_data[1] = ax&0xFF;
-					imu_data[2] = ay>>8;
-					imu_data[3] = ay&0xFF;
-					imu_data[4] = az>>8;
-					imu_data[5] = az&0xFF;
-					imu_data[6] = gx>>8;
+		uint32_t now = osKernelGetTickCount();
+		if (now - last_led_tick >= 1000)
+		{
+				last_led_tick = now;
+				HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_10);
+		}
+    lsm6dsv16x_flag_data_ready_get(&atk_ms6dsv, &drdy);
+    if (drdy.drdy_xl)
+    {
+         lsm6dsv16x_acceleration_raw_get(&atk_ms6dsv, data_raw_acceleration);
+         acceleration_mg[0] = lsm6dsv16x_from_fs2_to_mg(data_raw_acceleration[0]);
+         acceleration_mg[1] = lsm6dsv16x_from_fs2_to_mg(data_raw_acceleration[1]);
+         acceleration_mg[2] = lsm6dsv16x_from_fs2_to_mg(data_raw_acceleration[2]);
+    }
+     
+    if (drdy.drdy_gy)
+    {
+         lsm6dsv16x_angular_rate_raw_get(&atk_ms6dsv, data_raw_angular_rate);
+         angular_rate_mdps[0] = lsm6dsv16x_from_fs2000_to_mdps(data_raw_angular_rate[0]);
+         angular_rate_mdps[1] = lsm6dsv16x_from_fs2000_to_mdps(data_raw_angular_rate[1]);
+         angular_rate_mdps[2] = lsm6dsv16x_from_fs2000_to_mdps(data_raw_angular_rate[2]);
+    }
+    if (++i2ctimes == 20)
+    {
+        i2ctimes = 0;
+				int16_t ax =(int16_t)acceleration_mg[0];
+				int16_t ay =(int16_t)acceleration_mg[1];
+				int16_t az =(int16_t)acceleration_mg[2];
+				int16_t gx = (int16_t)angular_rate_mdps[0];
+				int16_t gy = (int16_t)angular_rate_mdps[1];
+				int16_t gz = (int16_t)angular_rate_mdps[2];
+				imu_data[0] = ax>>8;
+				imu_data[1] = ax&0xFF;
+				imu_data[2] = ay>>8;
+				imu_data[3] = ay&0xFF;
+				imu_data[4] = az>>8;
+				imu_data[5] = az&0xFF;
+				imu_data[6] = gx>>8;
 					
-					imu_data[7] = gx&0xFF;
-					imu_data[8] = gy>>8;
-					imu_data[9] = gy&0xFF;
-					imu_data[10] = gz>>8;
-					imu_data[11] = gz&0xFF;
+				imu_data[7] = gx&0xFF;
+				imu_data[8] = gy>>8;
+				imu_data[9] = gy&0xFF;
+				imu_data[10] = gz>>8;
+				imu_data[11] = gz&0xFF;
 					
 					
-						tx_len = serial_frame_build(
-						
+				tx_len = serial_frame_build(
 							0x11,
 						imu_data,
 						sizeof(imu_data),
 						tx_buf,
 						sizeof(tx_buf)
-							);
-						HAL_UART_Transmit(&huart6,tx_buf,tx_len,50);
-					// printf("\r\n******************************************\r\n");
-          //printf("Acceleration[mg]: %4.2f %4.2f %4.2f\r\n", acceleration_mg[0], acceleration_mg[1], acceleration_mg[2]);
-					//printf("%4.2f \n",acceleration_mg[2]/1000);
-            //printf("Angular rate[mdps]: %4.2f %4.2f %4.2f\r\n", angular_rate_mdps[0], angular_rate_mdps[1], angular_rate_mdps[2]);
-            //printf("Temperature[degC]: %6.2f\r\n", temperature_degc);
-        }
-        
-        osDelay(10);
-				
-				
-		//osDelay(1000);
+				);
+				HAL_UART_Transmit(&huart6,tx_buf,tx_len,50);
+     }
+    
+     osDelay(10);
   }
   /* USER CODE END Status_Task */
 }
@@ -519,24 +489,6 @@ void NeckTask(void *argument)
       }
   }
   /* USER CODE END NeckTask */
-}
-
-/* USER CODE BEGIN Header_StartTask05 */
-/**
-* @brief Function implementing the WatchDogTask thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_StartTask05 */
-void StartTask05(void *argument)
-{
-  /* USER CODE BEGIN StartTask05 */
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
-  /* USER CODE END StartTask05 */
 }
 
 /* Private application code --------------------------------------------------*/

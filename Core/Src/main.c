@@ -116,10 +116,9 @@ int main(void)
 	
 	Stepper_Init();
 	delay_init();
-	//TurnLeft();
+	
 	HAL_Delay(3000);
 	Car_Init();
-	//demo_run();
   /* USER CODE END 2 */
 
   /* Init scheduler */
