@@ -212,7 +212,7 @@ void StartDefaultTask(void *argument)
 									(int16_t)((pkt.data[2] << 8) | pkt.data[3]);
 
 					
-									  Motor_SetSpeed_FromCmd(&cmd, 100);
+									  Motor_SetSpeed_FromCmd(&cmd, 18);
 									  //send cmd and v 
 										uint8_t ack_data[] = {0x00};
 										tx_len = serial_frame_build(0x81, ack_data, 1,tx_buf, sizeof(tx_buf));
@@ -257,6 +257,38 @@ void StartDefaultTask(void *argument)
 										HAL_UART_Transmit(&huart6, tx_buf, tx_len, 100);
                     break;
 								}
+                case 0x06:
+								{
+										ArmRaise2();
+										uint8_t ack_data[] = {0x00};
+										tx_len = serial_frame_build(0x86, ack_data, 1,tx_buf, sizeof(tx_buf));
+										HAL_UART_Transmit(&huart6, tx_buf, tx_len, 100);
+                    break;
+								}
+								case 0x07:
+								{
+										ArmRaise3();
+										uint8_t ack_data[] = {0x00};
+										tx_len = serial_frame_build(0x87, ack_data, 1,tx_buf, sizeof(tx_buf));
+										HAL_UART_Transmit(&huart6, tx_buf, tx_len, 100);
+                    break;
+								}
+								case 0x08:
+								{
+										NeckUpDown();
+										uint8_t ack_data[] = {0x00};
+										tx_len = serial_frame_build(0x88, ack_data, 1,tx_buf, sizeof(tx_buf));
+										HAL_UART_Transmit(&huart6, tx_buf, tx_len, 100);
+                    break;
+								}		
+								case 0x09:
+								{
+										Armidle1();
+										uint8_t ack_data[] = {0x00};
+										tx_len = serial_frame_build(0x89, ack_data, 1,tx_buf, sizeof(tx_buf));
+										HAL_UART_Transmit(&huart6, tx_buf, tx_len, 100);
+                    break;
+								}	
                 default:
                     break;
                 }
@@ -294,7 +326,20 @@ void fun_ctrl_Task(void *argument)
   neck_cmd_t cmd;
 	Stop();
 	//GoAhead();
-	ArmUpDown();
+	ArmWave();
+	Armidle1();
+	osDelay(1000);
+	Armidle1();
+	osDelay(1000);
+	Armidle1();
+	ArmRaise1();
+		osDelay(1000);
+	ArmRaise2();
+		osDelay(1000);
+	ArmRaise3();
+		NeckUpDown();
+	osDelay(3000);
+		NeckUpDown();
   for(;;)
   {
          // ??? -> ??
