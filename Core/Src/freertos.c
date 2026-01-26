@@ -328,11 +328,11 @@ void Status_Task(void *argument)
     if (ret != 0)
     {
         printf("ATK-MS6DSV init failed!\r\n");
-        while (1)
-        {
-            //LED0_TOGGLE();
-       osDelay(200);
-        }
+//        while (1)
+//        {
+//            //LED0_TOGGLE();
+//       osDelay(200);
+//        }
     }
 	lsm6dsv16x_filt_settling_mask_t filt_settling_mask;
 	lsm6dsv16x_data_ready_t drdy;
