@@ -23,9 +23,11 @@ void Car_Init(){
 
 	/* 使能 + 切速度环模式 + 设置转速 */
 	Motor_Enable(1);
+	HAL_Delay(50);
 	Motor_Enable(2);
 	HAL_Delay(50);
 	Motor_SetMode(1, MOTOR_MODE_SPEED);
+	HAL_Delay(50);
 	Motor_SetMode(2, MOTOR_MODE_SPEED);
 	HAL_Delay(50);
 }
@@ -340,8 +342,69 @@ void ArmFrontBack(){
 	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_4, 0);
 }
 
+void Armidle1()//次子
+{
+	int rand(void);     // 生成伪随机数
+	void srand(unsigned int seed); // 设置随机种子
+	uint32_t delay_ms = (rand() % 3 + 4) * 1000;  // 1000 / 2000 / 3000 ms
+	
+	Stepper_SetSpeed(5);
 
+	Stepper_RotateAngle1(12, STEPPER_BACKWARD);//左翅中摆动
+	osDelay(delay_ms);
+	Stepper_RotateAngle1(7, STEPPER_FORWARD);//左翅中摆动
+}
+void ArmRaise1()//举手1次子
+{
+	Stepper_SetSpeed(5);
 
+	Stepper_RotateAngle1(22, STEPPER_BACKWARD);//左翅中摆动
+
+}
+void ArmRaise2()//举手次子
+{
+
+	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, 1000);//左翅尖摆动
+	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, 2000);
+	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, 1000);//右翅尖摆动
+	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_2, 2000);
+	osDelay(80);
+	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, 2000);//左翅尖摆动
+	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, 2000);
+	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, 2000);//右翅尖摆动
+	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_2, 2000);
+	osDelay(10);
+
+	osDelay(10);
+	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, 2000);//左翅尖摆动
+	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, 1000);
+	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, 2000);//右翅尖摆动
+	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_2, 1000);
+	osDelay(145);
+	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, 2000);//左翅尖摆动
+	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, 2000);
+	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, 2000);//右翅尖摆动
+	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_2, 2000);
+	osDelay(10);
+
+	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, 1000);//左翅尖摆动
+	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, 2000);
+	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, 1000);//右翅尖摆动
+	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_2, 2000);
+	osDelay(80);
+	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, 2000);//左翅尖摆动
+	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, 2000);
+	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, 2000);//右翅尖摆动
+	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_2, 2000);
+	osDelay(10);
+}
+void ArmRaise3()//举手3次子
+{
+	Stepper_SetSpeed(5);
+
+	Stepper_RotateAngle1(17, STEPPER_FORWARD);//左翅中摆动
+
+}
 
 
 

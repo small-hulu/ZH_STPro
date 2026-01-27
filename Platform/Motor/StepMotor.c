@@ -70,7 +70,7 @@ void Stepper_Step(uint8_t side,uint8_t direction) {
 		}
 
 	setOutput(side,~stepSequence[currentStep]);  //UNL2003 ~
-    osDelay(stepDelay/1000);
+    HAL_Delay(stepDelay/2950);
  /*   if (stepDelay % 1000 > 0) {
         delay_us(stepDelay % 1000);
     }*/
@@ -80,10 +80,10 @@ void Stepper_RotateAngle1(float angle, uint8_t direction) {
     uint32_t steps = (uint32_t)((angle / 360.0f) * TOTAL_STEPS_PER_REV)/2;
     for (uint32_t i = 0; i < steps; i++) {
         Stepper_Step(Left,direction);
-        //Stepper_Step(Right,direction);
+        Stepper_Step(Right,direction);
     }
     Stepper_Stop(Left);
-    //Stepper_Stop(Right);
+    Stepper_Stop(Right);
 }
 void Stepper_RotateAngle2(float angle, uint8_t direction) {
     uint32_t steps = (uint32_t)((angle / 360.0f) * TOTAL_STEPS_PER_REV)/2;
