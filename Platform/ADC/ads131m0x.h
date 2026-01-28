@@ -35,9 +35,9 @@
 
 #ifndef ADS131M0X_H_
 #define ADS131M0X_H_
-
+#define assert(param) ((void)0)
 // Standard libraries
-#include <assert.h>
+//#include <assert.h>
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -329,7 +329,7 @@
 
     /* WLENGTH field mask & values */
     #define MODE_WLENGTH_MASK                                               ((uint16_t) 0x0300)
-    #define MODE_WLENGTH_16BIT                                              ((uint16_t) 0x0000 << 8)
+    //#define MODE_WLENGTH_16BIT                                              ((uint16_t) 0x0000 << 8)
     #define MODE_WLENGTH_24BIT                                              ((uint16_t) 0x0001 << 8)
     #define MODE_WLENGTH_32BIT_LSB_ZEROES                                   ((uint16_t) 0x0002 << 8)
     #define MODE_WLENGTH_32BIT_MSB_SIGN_EXT                                 ((uint16_t) 0x0003 << 8)
@@ -1590,12 +1590,47 @@
 //
 //****************************************************************************
 
-typedef struct
-{
-    uint16_t response;
-    uint16_t crc;
-    int32_t channel0;
+//typedef struct
+//{
+//    uint16_t response;
+//    uint16_t crc;
+//    int32_t channel0;
 
+//#if (CHANNEL_COUNT > 1)
+//    int32_t channel1;
+//#endif
+//#if (CHANNEL_COUNT > 2)
+//    int32_t channel2;
+//#endif
+//#if (CHANNEL_COUNT > 3)
+//    int32_t channel3;
+//#endif
+//#if (CHANNEL_COUNT > 4)
+//    int32_t channel4;
+//#endif
+//#if (CHANNEL_COUNT > 5)
+//    int32_t channel5;
+//#endif
+//#if (CHANNEL_COUNT > 6)
+//    int32_t channel6;
+// #endif
+// #if (CHANNEL_COUNT > 7)
+//    int32_t channel7;
+//#endif
+//} adc_channel_data;
+
+
+
+//****************************************************************************
+//
+// Function prototypes
+//
+//****************************************************************************
+
+// ?? ADC ???????
+typedef struct {
+    uint16_t response;
+    int32_t channel0;
 #if (CHANNEL_COUNT > 1)
     int32_t channel1;
 #endif
@@ -1617,19 +1652,26 @@ typedef struct
  #if (CHANNEL_COUNT > 7)
     int32_t channel7;
 #endif
+// ... ???? ...
+    uint16_t crc;
 } adc_channel_data;
 
+// ======== ?????? ========
+#define ADC_NUM_CHANNELS CHANNEL_COUNT // ??????,????
 
+// ?? ADC ???????????
+typedef struct {
+    float voltage[ADC_NUM_CHANNELS]; // ??????????
+} adc_voltage_data;
 
-//****************************************************************************
-//
-// Function prototypes
-//
-//****************************************************************************
+// ??????:??????????????
+bool readData(adc_channel_data *DataStruct, adc_voltage_data *VoltageData);
+// ======== ?????? ========
+
 
 void        adcStartup(void);
 uint16_t    sendCommand(uint16_t op_code);
-bool        readData(adc_channel_data *DataStruct);
+//bool        readData(adc_channel_data *DataStruct);
 uint16_t    readSingleRegister(uint8_t address);
 void        writeSingleRegister(uint8_t address, uint16_t data);
 bool        lockRegisters(void);
@@ -1646,6 +1688,9 @@ uint8_t     upperByte(uint16_t uint16_Word);
 uint8_t     lowerByte(uint16_t uint16_Word);
 uint16_t    combineBytes(uint8_t upperByte, uint8_t lowerByte);
 int32_t     signExtend(const uint8_t dataBytes[]);
+
+
+
 
 
 

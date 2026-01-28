@@ -30,6 +30,7 @@
 #include "demo.h"
 #include "../Platform/IMU/lsm6dsv16x_reg.h"
 #include "../Platform/IMU/atk_ms6dsv.h"
+#include "../Platform/ADC/ads131m0x.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -42,6 +43,9 @@
 	uint8_t ret;
 	int16_t data_raw_acceleration[3];
 	int16_t data_raw_angular_rate[3];
+	
+adc_channel_data myAdcRawData;     // ?? ADC ??
+adc_voltage_data myAdcVoltageData; // ???????
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -81,6 +85,13 @@ const osThreadAttr_t neckTask_attributes = {
   .stack_size = 512 * 4,
   .priority = (osPriority_t) osPriorityLow,
 };
+/* Definitions for adcTask */
+osThreadId_t adcTaskHandle;
+const osThreadAttr_t adcTask_attributes = {
+  .name = "adcTask",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
+};
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -100,6 +111,7 @@ void StartDefaultTask(void *argument);
 void fun_ctrl_Task(void *argument);
 void Status_Task(void *argument);
 void NeckTask(void *argument);
+void AdcTask(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -148,6 +160,9 @@ void MX_FREERTOS_Init(void) {
 
   /* creation of neckTask */
   neckTaskHandle = osThreadNew(NeckTask, NULL, &neckTask_attributes);
+
+  /* creation of adcTask */
+  adcTaskHandle = osThreadNew(AdcTask, NULL, &adcTask_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -494,6 +509,79 @@ void NeckTask(void *argument)
       }
   }
   /* USER CODE END NeckTask */
+}
+
+/* USER CODE BEGIN Header_AdcTask */
+/**
+* @brief Function implementing the adcTask thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_AdcTask */
+void AdcTask(void *argument)
+{
+  /* USER CODE BEGIN AdcTask */
+	
+	uint16_t regValue = 0;
+
+    // 1. ??????
+    vTaskDelay(pdMS_TO_TICKS(100));
+
+    // 2. ??? ADC (????????)
+    // ??:???????????????
+    printf("Starting ADC Startup...\r\n");
+    adcStartup(); 
+    
+    // 3. ???????? ID ??? (?? 0x00)
+    // ADS131M0x ? ID ??????? 0 ?,??????
+    // ?????? 0x0000 ? 0xFFFF,?? SPI ?????????
+    regValue = readSingleRegister(ID_ADDRESS);
+    printf("Read ID Register: 0x%04X\r\n", regValue);
+
+    if (regValue == 0x0000 || regValue == 0xFFFF) {
+        printf("Error: SPI Communication Failed!\r\n");
+        // ????,???????,????????
+        while(1) {
+            vTaskDelay(500);
+        }
+    }
+ // 4. ?? STATUS ???
+    regValue = readSingleRegister(STATUS_ADDRESS);
+    printf("Read STATUS Register: 0x%04X\r\n", regValue);
+	
+  /* Infinite loop */
+  for(;;)
+  {
+		    if (HAL_GPIO_ReadPin(nDRDY_PORT, nDRDY_PIN) == GPIO_PIN_RESET)
+        {
+            // ?????,????
+            // readData ????? CS -> ?? NULL -> ???? -> ?? CS
+           bool crcError = readData(&myAdcRawData, &myAdcVoltageData);
+
+            if (!crcError) {
+                // ???? 0 ??? (?? 24bit ??,?? hex ????)
+//                printf("CH0: %ld, Status: 0x%04X\r\n", 
+//                        (long)myAdcData.channel0, 
+//                        myAdcData.response);
+											printf("CH0:%ld\n", myAdcRawData.channel0);
+												
+            } else {
+                printf("CRC Error!\r\n");
+            }
+
+            // ????????????,????????
+            // ??:????????????,????????
+            vTaskDelay(pdMS_TO_TICKS(100)); 
+        }
+        else
+        {
+            // ?? DRDY ?????,?? 10ms ????
+            // ??????? CPU
+            vTaskDelay(pdMS_TO_TICKS(1));
+        }
+    //osDelay(1);
+  }
+  /* USER CODE END AdcTask */
 }
 
 /* Private application code --------------------------------------------------*/

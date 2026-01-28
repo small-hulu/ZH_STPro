@@ -61,10 +61,12 @@ void Error_Handler(void);
 #define IMU_INT_GPIO_Port GPIOF
 #define IMU_AD0_Pin GPIO_PIN_0
 #define IMU_AD0_GPIO_Port GPIOC
-#define sda_Pin GPIO_PIN_6
-#define sda_GPIO_Port GPIOB
-#define scl_Pin GPIO_PIN_7
-#define scl_GPIO_Port GPIOB
+#define SYNC_ADS_Pin GPIO_PIN_15
+#define SYNC_ADS_GPIO_Port GPIOG
+#define DRDY_ADS_Pin GPIO_PIN_6
+#define DRDY_ADS_GPIO_Port GPIOB
+#define CS_ADS_Pin GPIO_PIN_7
+#define CS_ADS_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 #define ARRAY_LENGTH(arr)  (sizeof(arr) / sizeof((arr)[0]))

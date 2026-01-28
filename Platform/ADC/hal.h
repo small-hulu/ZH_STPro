@@ -46,6 +46,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "stm32f4xx_hal.h"
 
 
 //****************************************************************************
@@ -55,7 +56,7 @@
 //****************************************************************************
 
 /*  --- INSERT YOUR CODE HERE --- */
-#include "ti/devices/msp432e4/driverlib/driverlib.h"
+//#include "ti/devices/msp432e4/driverlib/driverlib.h"
 
 
 
@@ -88,15 +89,14 @@
 //
 //*****************************************************************************
 
-#define nDRDY_PORT          (GPIO_PORTM_BASE)
-#define nDRDY_PIN           (GPIO_PIN_0)
-#define nDRDY_INT           (INT_GPIOM)
+#define nDRDY_PORT          (GPIOB)
+#define nDRDY_PIN           (GPIO_PIN_6)
 
-#define nCS_PORT            (GPIO_PORTK_BASE)
-#define nCS_PIN             (GPIO_PIN_5)
+#define nCS_PORT            (GPIOB)
+#define nCS_PIN             (GPIO_PIN_7)
 
-#define nSYNC_nRESET_PORT   (GPIO_PORTK_BASE)
-#define nSYNC_nRESET_PIN    (GPIO_PIN_4)
+#define nSYNC_nRESET_PORT   (GPIOG)
+#define nSYNC_nRESET_PIN    (GPIO_PIN_15)
 
 // (OPTIONAL) External clock source
 //#define CLKIN_PORT          (GPIO_PORTG_BASE)
@@ -111,8 +111,6 @@
 //*****************************************************************************
 
 void    InitADC(void);
-void    delay_ms(const uint32_t delay_time_ms);
-void    delay_us(const uint32_t delay_time_us);
 void    setCS(const bool state);
 void    setSYNC_RESET(const bool state);
 void    toggleSYNC(void);

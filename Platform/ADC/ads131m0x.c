@@ -33,7 +33,15 @@
 
 #include "../ADC/ads131m0x.h"
 
-
+#define VREF_VOLTAGE    3.3f    // ?????? 1.2V
+#define ADC_MAX_CODE    8388607.0f // ?? 24?????,???? (2^23 - 1)
+#define PGA_GAIN_CH0    1.0f    // ???? 0 ??? 1 (?????????)
+#define PGA_GAIN_CH1    1.0f    // ???? 0 ??? 1 (?????????)
+#define PGA_GAIN_CH2    1.0f    // ???? 0 ??? 1 (?????????)
+#define PGA_GAIN_CH3    1.0f    // ???? 0 ??? 1 (?????????)
+#define PGA_GAIN_CH4    1.0f    // ???? 0 ??? 1 (?????????)
+#define PGA_GAIN_CH5    1.0f    // ???? 0 ??? 1 (?????????)
+#define PGA_GAIN_CH6    1.0f    // ???? 0 ??? 1 (?????????)
 
 //****************************************************************************
 //
@@ -128,6 +136,15 @@ void adcStartup(void)
     /* (OPTIONAL) Read back all registers */
 
 	/* (OPTIONAL) Check STATUS register for faults */
+	
+	 writeSingleRegister(MODE_ADDRESS, 0x0510);
+    
+    // ????????????
+    delay_ms(10);
+
+    // ???????????,????? 0x05xx
+    uint16_t currentMode = readSingleRegister(MODE_ADDRESS);
+    printf("Check MODE Reg: 0x%04X\r\n", currentMode);
 }
 
 
@@ -236,124 +253,192 @@ void writeSingleRegister(uint8_t address, uint16_t data)
 //! \return Returns true if the CRC-OUT of the data read detects an error.
 //
 //*****************************************************************************
-bool readData(adc_channel_data *DataStruct)
+//bool readData(adc_channel_data *DataStruct)
+//{
+//    int i;
+//    uint8_t crcTx[4]                        = { 0 };
+//    uint8_t dataRx[4]                       = { 0 };
+//    uint8_t bytesPerWord                    = getWordByteLength();
+
+//#ifdef ENABLE_CRC_IN
+//    // Build CRC word (only if "RX_CRC_EN" register bit is enabled)
+//    uint16_t crcWordIn = calculateCRC(&DataTx[0], bytesPerWord * 2, 0xFFFF);
+//    crcTx[0] = upperByte(crcWordIn);
+//    crcTx[1] = lowerByte(crcWordIn);
+//#endif
+
+//    /* Set the nCS pin LOW */
+//    setCS(LOW);
+
+//    // Send NULL word, receive response word
+//    for (i = 0; i < bytesPerWord; i++)
+//    {
+//        dataRx[i] = spiSendReceiveByte(0x00);
+//    }
+//    DataStruct->response = combineBytes(dataRx[0], dataRx[1]);
+
+//    // (OPTIONAL) Do something with the response (STATUS) word.
+//    // ...Here we only use the response for calculating the CRC-OUT
+//    //uint16_t crcWord = calculateCRC(&dataRx[0], bytesPerWord, 0xFFFF);
+
+//    // (OPTIONAL) Ignore CRC error checking
+//    uint16_t crcWord = 0;
+
+//    // Send 2nd word, receive channel 1 data
+//    for (i = 0; i < bytesPerWord; i++)
+//    {
+//        dataRx[i] = spiSendReceiveByte(crcTx[i]);
+//    }
+//    DataStruct->channel0 = signExtend(&dataRx[0]);
+//    //crcWord = calculateCRC(&dataRx[0], bytesPerWord, crcWord);
+
+//#if (CHANNEL_COUNT > 1)
+
+//    // Send 3rd word, receive channel 2 data
+//    for (i = 0; i < bytesPerWord; i++)
+//    {
+//        dataRx[i] = spiSendReceiveByte(0x00);
+//    }
+//    DataStruct->channel1 = signExtend(&dataRx[0]);
+//    //crcWord = calculateCRC(&dataRx[0], bytesPerWord, crcWord);
+
+//#endif
+//#if (CHANNEL_COUNT > 2)
+
+//    // Send 4th word, receive channel 3 data
+//    for (i = 0; i < bytesPerWord; i++)
+//    {
+//        dataRx[i] = spiSendReceiveByte(0x00);
+//    }
+//    DataStruct->channel2 = signExtend(&dataRx[0]);
+//    //crcWord = calculateCRC(&dataRx[0], bytesPerWord, crcWord);
+
+//#endif
+//#if (CHANNEL_COUNT > 3)
+
+//    // Send 5th word, receive channel 4 data
+//    for (i = 0; i < bytesPerWord; i++)
+//    {
+//        dataRx[i] = spiSendReceiveByte(0x00);
+//    }
+//    DataStruct->channel3 = signExtend(&dataRx[0]);
+//    //crcWord = calculateCRC(&dataRx[0], bytesPerWord, crcWord);
+
+//#endif
+//#if (CHANNEL_COUNT > 4)
+
+//    // Send 6th word, receive channel 5 data
+//    for (i = 0; i < bytesPerWord; i++)
+//    {
+//        dataRx[i] = spiSendReceiveByte(0x00);
+//    }
+//    DataStruct->channel4 = signExtend(&dataRx[0]);
+//    //crcWord = calculateCRC(&dataRx[0], bytesPerWord, crcWord);
+
+//#endif
+//#if (CHANNEL_COUNT > 5)
+
+//    // Send 7th word, receive channel 6 data
+//    for (i = 0; i < bytesPerWord; i++)
+//    {
+//        dataRx[i] = spiSendReceiveByte(0x00);
+//    }
+//    DataStruct->channel5 = signExtend(&dataRx[0]);
+//    //crcWord = calculateCRC(&dataRx[0], bytesPerWord, crcWord);
+
+//#endif
+//#if (CHANNEL_COUNT > 6)
+
+//    // Send 8th word, receive channel 7 data
+//    for (i = 0; i < bytesPerWord; i++)
+//    {
+//        dataRx[i] = spiSendReceiveByte(0x00);
+//    }
+//    DataStruct->channel6 = signExtend(&dataRx[0]);
+//    //crcWord = calculateCRC(&dataRx[0], bytesPerWord, crcWord);
+
+//#endif
+//#if (CHANNEL_COUNT > 7)
+
+//    // Send 9th word, receive channel 8 data
+//    for (i = 0; i < bytesPerWord; i++)
+//    {
+//        dataRx[i] = spiSendReceiveByte(0x00);
+//    }
+//    DataStruct->channel7 = signExtend(&dataRx[0]);
+//    //crcWord = calculateCRC(&dataRx[0], bytesPerWord, crcWord);
+
+//#endif
+
+//    // Send the next word, receive CRC data
+//    for (i = 0; i < bytesPerWord; i++)
+//    {
+//        dataRx[i] = spiSendReceiveByte(0x00);
+//    }
+//    DataStruct->crc = combineBytes(dataRx[0], dataRx[1]);
+
+//    /* NOTE: If we continue calculating the CRC with a matching CRC, the result should be zero.
+//     * Any non-zero result will indicate a mismatch.
+//     */
+//    //crcWord = calculateCRC(&dataRx[0], bytesPerWord, crcWord);
+
+//    /* Set the nCS pin HIGH */
+//    setCS(HIGH);
+
+//    // Returns true when a CRC error occurs
+//    return ((bool) crcWord);
+//}
+
+
+
+
+bool readData(adc_channel_data *DataStruct, adc_voltage_data *VoltageData)
 {
     int i;
-    uint8_t crcTx[4]                        = { 0 };
-    uint8_t dataRx[4]                       = { 0 };
-    uint8_t bytesPerWord                    = getWordByteLength();
+    uint8_t crcTx[4] = { 0 };
+    uint8_t dataRx[4] = { 0 };
+    uint8_t bytesPerWord = getWordByteLength();
+    bool crcError = false; // ??????? CRC ??
 
-#ifdef ENABLE_CRC_IN
-    // Build CRC word (only if "RX_CRC_EN" register bit is enabled)
-    uint16_t crcWordIn = calculateCRC(&DataTx[0], bytesPerWord * 2, 0xFFFF);
-    crcTx[0] = upperByte(crcWordIn);
-    crcTx[1] = lowerByte(crcWordIn);
-#endif
+    // ... (CRC_IN ?????????) ...
 
     /* Set the nCS pin LOW */
     setCS(LOW);
 
-    // Send NULL word, receive response word
+    // Send NULL word, receive response word (Status)
     for (i = 0; i < bytesPerWord; i++)
     {
         dataRx[i] = spiSendReceiveByte(0x00);
     }
     DataStruct->response = combineBytes(dataRx[0], dataRx[1]);
+    
+    // Calculate CRC (if enabled and applicable)
+    uint16_t crcWord = 0; // Or calculateCRC(&dataRx[0], bytesPerWord, 0xFFFF); if you want to include STATUS in CRC-OUT
 
-    // (OPTIONAL) Do something with the response (STATUS) word.
-    // ...Here we only use the response for calculating the CRC-OUT
-    //uint16_t crcWord = calculateCRC(&dataRx[0], bytesPerWord, 0xFFFF);
-
-    // (OPTIONAL) Ignore CRC error checking
-    uint16_t crcWord = 0;
-
-    // Send 2nd word, receive channel 1 data
+    // --- Channel 0 data ---
     for (i = 0; i < bytesPerWord; i++)
     {
-        dataRx[i] = spiSendReceiveByte(crcTx[i]);
+        dataRx[i] = spiSendReceiveByte(crcTx[i]); // If CRC_IN is enabled, send CRC_IN word here
     }
     DataStruct->channel0 = signExtend(&dataRx[0]);
-    //crcWord = calculateCRC(&dataRx[0], bytesPerWord, crcWord);
+    // Convert raw data to voltage for CH0
+    VoltageData->voltage[0] = ((float)DataStruct->channel0 / ADC_MAX_CODE) * (VREF_VOLTAGE / PGA_GAIN_CH0);
+    // crcWord = calculateCRC(&dataRx[0], bytesPerWord, crcWord); // If including CH0 in CRC-OUT
 
 #if (CHANNEL_COUNT > 1)
-
-    // Send 3rd word, receive channel 2 data
+    // --- Channel 1 data ---
     for (i = 0; i < bytesPerWord; i++)
     {
         dataRx[i] = spiSendReceiveByte(0x00);
     }
     DataStruct->channel1 = signExtend(&dataRx[0]);
-    //crcWord = calculateCRC(&dataRx[0], bytesPerWord, crcWord);
-
+    VoltageData->voltage[1] = ((float)DataStruct->channel1 / ADC_MAX_CODE) * (VREF_VOLTAGE / PGA_GAIN_CH1); // Use PGA_GAIN_CH1
+    // crcWord = calculateCRC(&dataRx[0], bytesPerWord, crcWord);
 #endif
-#if (CHANNEL_COUNT > 2)
+// ... (????,????????????) ...
 
-    // Send 4th word, receive channel 3 data
-    for (i = 0; i < bytesPerWord; i++)
-    {
-        dataRx[i] = spiSendReceiveByte(0x00);
-    }
-    DataStruct->channel2 = signExtend(&dataRx[0]);
-    //crcWord = calculateCRC(&dataRx[0], bytesPerWord, crcWord);
 
-#endif
-#if (CHANNEL_COUNT > 3)
-
-    // Send 5th word, receive channel 4 data
-    for (i = 0; i < bytesPerWord; i++)
-    {
-        dataRx[i] = spiSendReceiveByte(0x00);
-    }
-    DataStruct->channel3 = signExtend(&dataRx[0]);
-    //crcWord = calculateCRC(&dataRx[0], bytesPerWord, crcWord);
-
-#endif
-#if (CHANNEL_COUNT > 4)
-
-    // Send 6th word, receive channel 5 data
-    for (i = 0; i < bytesPerWord; i++)
-    {
-        dataRx[i] = spiSendReceiveByte(0x00);
-    }
-    DataStruct->channel4 = signExtend(&dataRx[0]);
-    //crcWord = calculateCRC(&dataRx[0], bytesPerWord, crcWord);
-
-#endif
-#if (CHANNEL_COUNT > 5)
-
-    // Send 7th word, receive channel 6 data
-    for (i = 0; i < bytesPerWord; i++)
-    {
-        dataRx[i] = spiSendReceiveByte(0x00);
-    }
-    DataStruct->channel5 = signExtend(&dataRx[0]);
-    //crcWord = calculateCRC(&dataRx[0], bytesPerWord, crcWord);
-
-#endif
-#if (CHANNEL_COUNT > 6)
-
-    // Send 8th word, receive channel 7 data
-    for (i = 0; i < bytesPerWord; i++)
-    {
-        dataRx[i] = spiSendReceiveByte(0x00);
-    }
-    DataStruct->channel6 = signExtend(&dataRx[0]);
-    //crcWord = calculateCRC(&dataRx[0], bytesPerWord, crcWord);
-
-#endif
-#if (CHANNEL_COUNT > 7)
-
-    // Send 9th word, receive channel 8 data
-    for (i = 0; i < bytesPerWord; i++)
-    {
-        dataRx[i] = spiSendReceiveByte(0x00);
-    }
-    DataStruct->channel7 = signExtend(&dataRx[0]);
-    //crcWord = calculateCRC(&dataRx[0], bytesPerWord, crcWord);
-
-#endif
-
-    // Send the next word, receive CRC data
+    // --- Receive CRC data ---
     for (i = 0; i < bytesPerWord; i++)
     {
         dataRx[i] = spiSendReceiveByte(0x00);
@@ -363,15 +448,14 @@ bool readData(adc_channel_data *DataStruct)
     /* NOTE: If we continue calculating the CRC with a matching CRC, the result should be zero.
      * Any non-zero result will indicate a mismatch.
      */
-    //crcWord = calculateCRC(&dataRx[0], bytesPerWord, crcWord);
+    // crcWord = calculateCRC(&dataRx[0], bytesPerWord, crcWord);
+    // if (DataStruct->crc != crcWord) { crcError = true; } // Compare with received CRC
 
     /* Set the nCS pin HIGH */
     setCS(HIGH);
 
-    // Returns true when a CRC error occurs
-    return ((bool) crcWord);
+    return crcError; // Return true if a CRC error occurred
 }
-
 
 
 //*****************************************************************************
