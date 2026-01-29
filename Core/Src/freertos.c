@@ -89,7 +89,7 @@ const osThreadAttr_t neckTask_attributes = {
 osThreadId_t adcTaskHandle;
 const osThreadAttr_t adcTask_attributes = {
   .name = "adcTask",
-  .stack_size = 128 * 4,
+  .stack_size = 512 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
 
@@ -156,7 +156,7 @@ void MX_FREERTOS_Init(void) {
   fun_ctrl_taskHandle = osThreadNew(fun_ctrl_Task, NULL, &fun_ctrl_task_attributes);
 
   /* creation of status_task */
-  status_taskHandle = osThreadNew(Status_Task, NULL, &status_task_attributes);
+ // status_taskHandle = osThreadNew(Status_Task, NULL, &status_task_attributes);
 
   /* creation of neckTask */
   neckTaskHandle = osThreadNew(NeckTask, NULL, &neckTask_attributes);
@@ -521,62 +521,38 @@ void NeckTask(void *argument)
 void AdcTask(void *argument)
 {
   /* USER CODE BEGIN AdcTask */
-	
 	uint16_t regValue = 0;
-
-    // 1. ??????
-    vTaskDelay(pdMS_TO_TICKS(100));
-
-    // 2. ??? ADC (????????)
-    // ??:???????????????
-    printf("Starting ADC Startup...\r\n");
-    adcStartup(); 
-    
-    // 3. ???????? ID ??? (?? 0x00)
-    // ADS131M0x ? ID ??????? 0 ?,??????
-    // ?????? 0x0000 ? 0xFFFF,?? SPI ?????????
+  vTaskDelay(pdMS_TO_TICKS(100));
+  printf("Starting ADC Startup...\r\n");
+  adcStartup(); 
+  printf("ADC Initialized. Waiting for stable...\r\n");
+	vTaskDelay(pdMS_TO_TICKS(500));
     regValue = readSingleRegister(ID_ADDRESS);
     printf("Read ID Register: 0x%04X\r\n", regValue);
-
     if (regValue == 0x0000 || regValue == 0xFFFF) {
         printf("Error: SPI Communication Failed!\r\n");
-        // ????,???????,????????
         while(1) {
             vTaskDelay(500);
         }
     }
- // 4. ?? STATUS ???
     regValue = readSingleRegister(STATUS_ADDRESS);
     printf("Read STATUS Register: 0x%04X\r\n", regValue);
-	
   /* Infinite loop */
   for(;;)
   {
 		    if (HAL_GPIO_ReadPin(nDRDY_PORT, nDRDY_PIN) == GPIO_PIN_RESET)
         {
-            // ?????,????
-            // readData ????? CS -> ?? NULL -> ???? -> ?? CS
            bool crcError = readData(&myAdcRawData, &myAdcVoltageData);
-
             if (!crcError) {
-                // ???? 0 ??? (?? 24bit ??,?? hex ????)
-//                printf("CH0: %ld, Status: 0x%04X\r\n", 
-//                        (long)myAdcData.channel0, 
-//                        myAdcData.response);
 											printf("CH0:%ld\n", myAdcRawData.channel0);
-												
             } else {
                 printf("CRC Error!\r\n");
             }
-
-            // ????????????,????????
-            // ??:????????????,????????
             vTaskDelay(pdMS_TO_TICKS(100)); 
         }
         else
         {
-            // ?? DRDY ?????,?? 10ms ????
-            // ??????? CPU
+         
             vTaskDelay(pdMS_TO_TICKS(1));
         }
     //osDelay(1);

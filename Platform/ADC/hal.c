@@ -451,7 +451,13 @@ bool waitForDRDYinterrupt(uint32_t timeout_ms)
 //}
 void spiSendReceiveArrays(const uint8_t dataTx[], uint8_t dataRx[], uint8_t byteLength)
 {
+       //setCS(false); // false = LOW
+
+    // 2. ????
     HAL_SPI_TransmitReceive(&hspi1, (uint8_t*)dataTx, dataRx, byteLength, HAL_MAX_DELAY);
+
+    // 3. ????,????
+   // setCS(true);  // true = HIGH
 }
 
 

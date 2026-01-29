@@ -106,49 +106,62 @@ uint16_t getRegisterValue(uint8_t address)
 //! \return None.
 //
 //*****************************************************************************
+//void adcStartup(void)
+//{
+//	delay_ms(50);
+//	setSYNC_RESET(HIGH);
+//	toggleRESET();  
+//	restoreRegisterDefaults();
+//	uint16_t response = sendCommand(OPCODE_NULL);
+//    writeSingleRegister(CLOCK_ADDRESS, (CLOCK_DEFAULT & ~CLOCK_OSR_MASK) | CLOCK_OSR_256);   
+//    writeSingleRegister(MODE_ADDRESS, MODE_DEFAULT);
+//	 writeSingleRegister(MODE_ADDRESS, 0x0510);
+//    delay_ms(10);
+
+//    uint16_t currentMode = readSingleRegister(MODE_ADDRESS);
+//    printf("Check MODE Reg: 0x%04X\r\n", currentMode);
+//}
+
+
 void adcStartup(void)
 {
-	/* (OPTIONAL) Provide additional delay time for power supply settling */
-	delay_ms(50);
+    // 1. ????
+    setSYNC_RESET(LOW);
+    delay_ms(100);
+    setSYNC_RESET(HIGH);
+    delay_ms(100); // ??????????
 
-	/* (REQUIRED) Set nRESET pin high for ADC operation */
-	setSYNC_RESET(HIGH);
-
-	/* (OPTIONAL) Toggle nRESET pin to ensure default register settings. */
-	/* NOTE: This also ensures that the device registers are unlocked.	 */
-	toggleRESET();
-
-    /* (REQUIRED) Initialize internal 'registerMap' array with device default settings */
-	restoreRegisterDefaults();
-
-    /* (OPTIONAL) Validate first response word when beginning SPI communication: (0xFF20 | CHANCNT) */
-	uint16_t response = sendCommand(OPCODE_NULL);
-
-	/* (OPTIONAL) Define your initial register settings here */
-    writeSingleRegister(CLOCK_ADDRESS, (CLOCK_DEFAULT & ~CLOCK_OSR_MASK) | CLOCK_OSR_256);
-
-    /* (REQUIRED) Configure MODE register settings
-     * NOTE: This function call is required here for this particular code implementation to work.
-     * This function will enforce the MODE register settings as selected in the 'ads131m0x.h' header file.
-     */
-    writeSingleRegister(MODE_ADDRESS, MODE_DEFAULT);
-
-    /* (OPTIONAL) Read back all registers */
-
-	/* (OPTIONAL) Check STATUS register for faults */
-	
-	 writeSingleRegister(MODE_ADDRESS, 0x0510);
-    
-    // ????????????
+    // 2. ???? SPI ?? (???? NULL)
+    setCS(LOW);
+    for(int i=0; i<8; i++) {
+        spiSendReceiveByte(0x00);
+    }
+    setCS(HIGH);
     delay_ms(10);
 
-    // ???????????,????? 0x05xx
-    uint16_t currentMode = readSingleRegister(MODE_ADDRESS);
-    printf("Check MODE Reg: 0x%04X\r\n", currentMode);
+    // 3. ????? (????)
+    // 0x0655 = UNLOCK command
+    // ??????,????
+    setCS(LOW);
+    spiSendReceiveByte(0x06); // UNLOCK ???
+    spiSendReceiveByte(0x55); // UNLOCK ???
+    setCS(HIGH);
+    delay_ms(10);
+
+    // 4. ????? ID,??????
+    uint16_t idReg = 0;
+    printf("Attempting to read ID...\r\n");
+
+  
+
+    // 5. ?? ID ??,????????
+    printf("Configuring Registers...\r\n");
+    restoreRegisterDefaults();
+    
+    // ??? 24-bit, ????
+    writeSingleRegister(MODE_ADDRESS, 0x0510);
+    writeSingleRegister(CH0_CFG_ADDRESS, 0x0000); // ????
 }
-
-
-
 //*****************************************************************************
 //
 //! Reads the contents of a single register at the specified address.
@@ -398,13 +411,8 @@ bool readData(adc_channel_data *DataStruct, adc_voltage_data *VoltageData)
     uint8_t crcTx[4] = { 0 };
     uint8_t dataRx[4] = { 0 };
     uint8_t bytesPerWord = getWordByteLength();
-    bool crcError = false; // ??????? CRC ??
-
-    // ... (CRC_IN ?????????) ...
-
-    /* Set the nCS pin LOW */
+    bool crcError = false; 
     setCS(LOW);
-
     // Send NULL word, receive response word (Status)
     for (i = 0; i < bytesPerWord; i++)
     {
@@ -435,23 +443,11 @@ bool readData(adc_channel_data *DataStruct, adc_voltage_data *VoltageData)
     VoltageData->voltage[1] = ((float)DataStruct->channel1 / ADC_MAX_CODE) * (VREF_VOLTAGE / PGA_GAIN_CH1); // Use PGA_GAIN_CH1
     // crcWord = calculateCRC(&dataRx[0], bytesPerWord, crcWord);
 #endif
-// ... (????,????????????) ...
-
-
-    // --- Receive CRC data ---
     for (i = 0; i < bytesPerWord; i++)
     {
         dataRx[i] = spiSendReceiveByte(0x00);
     }
     DataStruct->crc = combineBytes(dataRx[0], dataRx[1]);
-
-    /* NOTE: If we continue calculating the CRC with a matching CRC, the result should be zero.
-     * Any non-zero result will indicate a mismatch.
-     */
-    // crcWord = calculateCRC(&dataRx[0], bytesPerWord, crcWord);
-    // if (DataStruct->crc != crcWord) { crcError = true; } // Compare with received CRC
-
-    /* Set the nCS pin HIGH */
     setCS(HIGH);
 
     return crcError; // Return true if a CRC error occurred

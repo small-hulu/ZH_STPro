@@ -102,6 +102,7 @@ int main(void)
   MX_USART6_UART_Init();
   MX_ADC1_Init();
   MX_SPI1_Init();
+  MX_UART4_Init();
   /* USER CODE BEGIN 2 */
 	if (HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1) != HAL_OK) { Error_Handler(); }
   if (HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2) != HAL_OK) { Error_Handler(); }
@@ -128,7 +129,6 @@ int main(void)
   /* Init scheduler */
   osKernelInitialize();  /* Call init function for freertos objects (in cmsis_os2.c) */
   MX_FREERTOS_Init();
-
   /* Start scheduler */
   osKernelStart();
 
