@@ -156,7 +156,7 @@ void MX_FREERTOS_Init(void) {
   fun_ctrl_taskHandle = osThreadNew(fun_ctrl_Task, NULL, &fun_ctrl_task_attributes);
 
   /* creation of status_task */
- // status_taskHandle = osThreadNew(Status_Task, NULL, &status_task_attributes);
+  status_taskHandle = osThreadNew(Status_Task, NULL, &status_task_attributes);
 
   /* creation of neckTask */
   neckTaskHandle = osThreadNew(NeckTask, NULL, &neckTask_attributes);
@@ -487,6 +487,9 @@ void NeckTask(void *argument)
   /* Infinite loop */
 	TickType_t last = xTaskGetTickCount();
 	neck_cmd_t cmd;
+			__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 150);
+		__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_3, 150);
+		__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_4, 150);
   for(;;)
   {
       if (xQueueReceive(neckQueue, &cmd, portMAX_DELAY) == pdTRUE)
@@ -527,10 +530,10 @@ void AdcTask(void *argument)
   adcStartup(); 
   printf("ADC Initialized. Waiting for stable...\r\n");
 	vTaskDelay(pdMS_TO_TICKS(500));
-    regValue = readSingleRegister(ID_ADDRESS);
-    printf("Read ID Register: 0x%04X\r\n", regValue);
-    if (regValue == 0x0000 || regValue == 0xFFFF) {
-        printf("Error: SPI Communication Failed!\r\n");
+  regValue = readSingleRegister(ID_ADDRESS);
+  printf("Read ID Register: 0x%04X\r\n", regValue);
+  if (regValue == 0x0000 || regValue == 0xFFFF) {
+			printf("Error: SPI Communication Failed!\r\n");
         while(1) {
             vTaskDelay(500);
         }
