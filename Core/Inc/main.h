@@ -59,12 +59,11 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define IMU_INT_Pin GPIO_PIN_6
 #define IMU_INT_GPIO_Port GPIOF
-#define IMU_AD0_Pin GPIO_PIN_0
-#define IMU_AD0_GPIO_Port GPIOC
 #define SYNC_ADS_Pin GPIO_PIN_15
 #define SYNC_ADS_GPIO_Port GPIOG
 #define DRDY_ADS_Pin GPIO_PIN_6
 #define DRDY_ADS_GPIO_Port GPIOB
+#define DRDY_ADS_EXTI_IRQn EXTI9_5_IRQn
 #define CS_ADS_Pin GPIO_PIN_7
 #define CS_ADS_GPIO_Port GPIOB
 

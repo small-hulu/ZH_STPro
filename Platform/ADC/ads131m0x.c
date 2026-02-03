@@ -1,61 +1,18 @@
-/**
- * \copyright Copyright (C) 2019 Texas Instruments Incorporated - http://www.ti.com/
- *
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions
- *  are met:
- *
- *    Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- *
- *    Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the
- *    distribution.
- *
- *    Neither the name of Texas Instruments Incorporated nor the names of
- *    its contributors may be used to endorse or promote products derived
- *    from this software without specific prior written permission.
- *
- *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- *  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- *  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- *  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- *  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- */
 
 #include "../ADC/ads131m0x.h"
-
-#define VREF_VOLTAGE    3.3f    // ?????? 1.2V
-#define ADC_MAX_CODE    8388607.0f // ?? 24?????,???? (2^23 - 1)
-#define PGA_GAIN_CH0    1.0f    // ???? 0 ??? 1 (?????????)
-#define PGA_GAIN_CH1    1.0f    // ???? 0 ??? 1 (?????????)
-#define PGA_GAIN_CH2    1.0f    // ???? 0 ??? 1 (?????????)
-#define PGA_GAIN_CH3    1.0f    // ???? 0 ??? 1 (?????????)
-#define PGA_GAIN_CH4    1.0f    // ???? 0 ??? 1 (?????????)
-#define PGA_GAIN_CH5    1.0f    // ???? 0 ??? 1 (?????????)
-#define PGA_GAIN_CH6    1.0f    // ???? 0 ??? 1 (?????????)
-
-//****************************************************************************
-//
-// Internal variables
-//
-//****************************************************************************
-
-// Array used to recall device register map configurations */
-static uint16_t             registerMap[NUM_REGISTERS];
+#define ANGLE_RANGE 90.0f
+#define ADC_MAX_CODE 8388607.0f // ?? 24?????,???? (2^23 - 1)
+#define PGA_GAIN_CH0 1.0f       // ???? 0 ??? 1 (?????????)
+#define PGA_GAIN_CH1 1.0f       // ???? 0 ??? 1 (?????????)
+#define PGA_GAIN_CH2 1.0f       // ???? 0 ??? 1 (?????????)
+#define PGA_GAIN_CH3 1.0f       // ???? 0 ??? 1 (?????????)
+#define PGA_GAIN_CH4 1.0f       // ???? 0 ??? 1 (?????????)
+#define PGA_GAIN_CH5 1.0f       // ???? 0 ??? 1 (?????????)
+#define PGA_GAIN_CH6 1.0f       // ???? 0 ??? 1 (?????????)
+static uint16_t registerMap[NUM_REGISTERS];
 
 // Array of SPI word lengths
-const static uint8_t        wlength_byte_values[] = {2, 3, 4, 4};
-
-
+const static uint8_t wlength_byte_values[] = {2, 3, 4, 4};
 
 //****************************************************************************
 //
@@ -63,11 +20,9 @@ const static uint8_t        wlength_byte_values[] = {2, 3, 4, 4};
 //
 //****************************************************************************
 
-uint8_t     buildSPIarray(const uint16_t opcodeArray[], uint8_t numberOpcodes, uint8_t byteArray[]);
-uint16_t    enforce_selected_device_modes(uint16_t data);
-uint8_t     getWordByteLength(void);
-
-
+uint8_t buildSPIarray(const uint16_t opcodeArray[], uint8_t numberOpcodes, uint8_t byteArray[]);
+uint16_t enforce_selected_device_modes(uint16_t data);
+uint8_t getWordByteLength(void);
 
 //*****************************************************************************
 //
@@ -91,8 +46,6 @@ uint16_t getRegisterValue(uint8_t address)
     return registerMap[address];
 }
 
-
-
 //*****************************************************************************
 //
 //! Example start up sequence for the ADS131M0x.
@@ -106,14 +59,14 @@ uint16_t getRegisterValue(uint8_t address)
 //! \return None.
 //
 //*****************************************************************************
-//void adcStartup(void)
+// void adcStartup(void)
 //{
 //	delay_ms(50);
 //	setSYNC_RESET(HIGH);
-//	toggleRESET();  
+//	toggleRESET();
 //	restoreRegisterDefaults();
 //	uint16_t response = sendCommand(OPCODE_NULL);
-//    writeSingleRegister(CLOCK_ADDRESS, (CLOCK_DEFAULT & ~CLOCK_OSR_MASK) | CLOCK_OSR_256);   
+//    writeSingleRegister(CLOCK_ADDRESS, (CLOCK_DEFAULT & ~CLOCK_OSR_MASK) | CLOCK_OSR_256);
 //    writeSingleRegister(MODE_ADDRESS, MODE_DEFAULT);
 //	 writeSingleRegister(MODE_ADDRESS, 0x0510);
 //    delay_ms(10);
@@ -122,45 +75,37 @@ uint16_t getRegisterValue(uint8_t address)
 //    printf("Check MODE Reg: 0x%04X\r\n", currentMode);
 //}
 
-
-void adcStartup(void)
+bool adcStartup(void)
 {
-    // 1. ????
     setSYNC_RESET(LOW);
     delay_ms(100);
     setSYNC_RESET(HIGH);
-    delay_ms(100); // ??????????
-
-    // 2. ???? SPI ?? (???? NULL)
+    delay_ms(100);
     setCS(LOW);
-    for(int i=0; i<8; i++) {
+    for (int i = 0; i < 8; i++)
+    {
         spiSendReceiveByte(0x00);
     }
     setCS(HIGH);
     delay_ms(10);
-
-    // 3. ????? (????)
-    // 0x0655 = UNLOCK command
-    // ??????,????
     setCS(LOW);
-    spiSendReceiveByte(0x06); // UNLOCK ???
-    spiSendReceiveByte(0x55); // UNLOCK ???
+    spiSendReceiveByte(0x06);
+    spiSendReceiveByte(0x55);
     setCS(HIGH);
     delay_ms(10);
 
-    // 4. ????? ID,??????
     uint16_t idReg = 0;
     printf("Attempting to read ID...\r\n");
-
-  
 
     // 5. ?? ID ??,????????
     printf("Configuring Registers...\r\n");
     restoreRegisterDefaults();
-    
+
     // ??? 24-bit, ????
     writeSingleRegister(MODE_ADDRESS, 0x0510);
     writeSingleRegister(CH0_CFG_ADDRESS, 0x0000); // ????
+
+    return 1;
 }
 //*****************************************************************************
 //
@@ -175,30 +120,28 @@ void adcStartup(void)
 //*****************************************************************************
 uint16_t readSingleRegister(uint8_t address)
 {
-	/* Check that the register address is in range */
-	assert(address < NUM_REGISTERS);
+    /* Check that the register address is in range */
+    assert(address < NUM_REGISTERS);
 
 // Build TX and RX byte array
 #ifdef ENABLE_CRC_IN
-    uint8_t dataTx[8] = { 0 };      // 2 words, up to 4 bytes each = 8 bytes maximum
-    uint8_t dataRx[8] = { 0 };
+    uint8_t dataTx[8] = {0}; // 2 words, up to 4 bytes each = 8 bytes maximum
+    uint8_t dataRx[8] = {0};
 #else
-    uint8_t dataTx[4] = { 0 };      // 1 word, up to 4 bytes long = 4 bytes maximum
-    uint8_t dataRx[4] = { 0 };
+    uint8_t dataTx[4] = {0}; // 1 word, up to 4 bytes long = 4 bytes maximum
+    uint8_t dataRx[4] = {0};
 #endif
-    uint16_t opcode = OPCODE_RREG | (((uint16_t) address) << 7);
+    uint16_t opcode = OPCODE_RREG | (((uint16_t)address) << 7);
     uint8_t numberOfBytes = buildSPIarray(&opcode, 1, dataTx);
 
-	// [FRAME 1] Send RREG command
-	spiSendReceiveArrays(dataTx, dataRx, numberOfBytes);
+    // [FRAME 1] Send RREG command
+    spiSendReceiveArrays(dataTx, dataRx, numberOfBytes);
 
-	// [FRAME 2] Send NULL command to retrieve the register data
-	registerMap[address] = sendCommand(OPCODE_NULL);
+    // [FRAME 2] Send NULL command to retrieve the register data
+    registerMap[address] = sendCommand(OPCODE_NULL);
 
-	return registerMap[address];
+    return registerMap[address];
 }
-
-
 
 //*****************************************************************************
 //
@@ -228,14 +171,14 @@ void writeSingleRegister(uint8_t address, uint16_t data)
 
     // Build TX and RX byte array
 #ifdef ENABLE_CRC_IN
-    uint8_t dataTx[12] = { 0 };     // 3 words, up to 4 bytes each = 12 bytes maximum
-    uint8_t dataRx[12] = { 0 };
+    uint8_t dataTx[12] = {0}; // 3 words, up to 4 bytes each = 12 bytes maximum
+    uint8_t dataRx[12] = {0};
 #else
-    uint8_t dataTx[8] = { 0 };      // 2 words, up to 4 bytes long = 8 bytes maximum
-    uint8_t dataRx[8] = { 0 };
+    uint8_t dataTx[8] = {0}; // 2 words, up to 4 bytes long = 8 bytes maximum
+    uint8_t dataRx[8] = {0};
 #endif
     uint16_t opcodes[2];
-    opcodes[0] = OPCODE_WREG | (((uint16_t) address) << 7);
+    opcodes[0] = OPCODE_WREG | (((uint16_t)address) << 7);
     opcodes[1] = data;
     uint8_t numberOfBytes = buildSPIarray(&opcodes[0], 2, dataTx);
 
@@ -250,35 +193,19 @@ void writeSingleRegister(uint8_t address, uint16_t data)
 
     // NOTE: Enabling the CRC words in the SPI command will NOT prevent an invalid W
 }
-
-
-
-//*****************************************************************************
-//
-//! Reads ADC data.
-//!
-//! \fn bool readData(adc_channel_data *DataStruct)
-//!
-//! \param *DataStruct points to an adc_channel_data type-defined structure/
-//!
-//! NOTE: Should be called after /DRDY goes low, and not during a /DRDY falling edge!
-//!
-//! \return Returns true if the CRC-OUT of the data read detects an error.
-//
-//*****************************************************************************
-//bool readData(adc_channel_data *DataStruct)
+// bool readData(adc_channel_data *DataStruct)
 //{
 //    int i;
 //    uint8_t crcTx[4]                        = { 0 };
 //    uint8_t dataRx[4]                       = { 0 };
 //    uint8_t bytesPerWord                    = getWordByteLength();
 
-//#ifdef ENABLE_CRC_IN
-//    // Build CRC word (only if "RX_CRC_EN" register bit is enabled)
-//    uint16_t crcWordIn = calculateCRC(&DataTx[0], bytesPerWord * 2, 0xFFFF);
-//    crcTx[0] = upperByte(crcWordIn);
-//    crcTx[1] = lowerByte(crcWordIn);
-//#endif
+// #ifdef ENABLE_CRC_IN
+//     // Build CRC word (only if "RX_CRC_EN" register bit is enabled)
+//     uint16_t crcWordIn = calculateCRC(&DataTx[0], bytesPerWord * 2, 0xFFFF);
+//     crcTx[0] = upperByte(crcWordIn);
+//     crcTx[1] = lowerByte(crcWordIn);
+// #endif
 
 //    /* Set the nCS pin LOW */
 //    setCS(LOW);
@@ -305,7 +232,7 @@ void writeSingleRegister(uint8_t address, uint16_t data)
 //    DataStruct->channel0 = signExtend(&dataRx[0]);
 //    //crcWord = calculateCRC(&dataRx[0], bytesPerWord, crcWord);
 
-//#if (CHANNEL_COUNT > 1)
+// #if (CHANNEL_COUNT > 1)
 
 //    // Send 3rd word, receive channel 2 data
 //    for (i = 0; i < bytesPerWord; i++)
@@ -315,8 +242,8 @@ void writeSingleRegister(uint8_t address, uint16_t data)
 //    DataStruct->channel1 = signExtend(&dataRx[0]);
 //    //crcWord = calculateCRC(&dataRx[0], bytesPerWord, crcWord);
 
-//#endif
-//#if (CHANNEL_COUNT > 2)
+// #endif
+// #if (CHANNEL_COUNT > 2)
 
 //    // Send 4th word, receive channel 3 data
 //    for (i = 0; i < bytesPerWord; i++)
@@ -326,8 +253,8 @@ void writeSingleRegister(uint8_t address, uint16_t data)
 //    DataStruct->channel2 = signExtend(&dataRx[0]);
 //    //crcWord = calculateCRC(&dataRx[0], bytesPerWord, crcWord);
 
-//#endif
-//#if (CHANNEL_COUNT > 3)
+// #endif
+// #if (CHANNEL_COUNT > 3)
 
 //    // Send 5th word, receive channel 4 data
 //    for (i = 0; i < bytesPerWord; i++)
@@ -337,8 +264,8 @@ void writeSingleRegister(uint8_t address, uint16_t data)
 //    DataStruct->channel3 = signExtend(&dataRx[0]);
 //    //crcWord = calculateCRC(&dataRx[0], bytesPerWord, crcWord);
 
-//#endif
-//#if (CHANNEL_COUNT > 4)
+// #endif
+// #if (CHANNEL_COUNT > 4)
 
 //    // Send 6th word, receive channel 5 data
 //    for (i = 0; i < bytesPerWord; i++)
@@ -348,8 +275,8 @@ void writeSingleRegister(uint8_t address, uint16_t data)
 //    DataStruct->channel4 = signExtend(&dataRx[0]);
 //    //crcWord = calculateCRC(&dataRx[0], bytesPerWord, crcWord);
 
-//#endif
-//#if (CHANNEL_COUNT > 5)
+// #endif
+// #if (CHANNEL_COUNT > 5)
 
 //    // Send 7th word, receive channel 6 data
 //    for (i = 0; i < bytesPerWord; i++)
@@ -359,8 +286,8 @@ void writeSingleRegister(uint8_t address, uint16_t data)
 //    DataStruct->channel5 = signExtend(&dataRx[0]);
 //    //crcWord = calculateCRC(&dataRx[0], bytesPerWord, crcWord);
 
-//#endif
-//#if (CHANNEL_COUNT > 6)
+// #endif
+// #if (CHANNEL_COUNT > 6)
 
 //    // Send 8th word, receive channel 7 data
 //    for (i = 0; i < bytesPerWord; i++)
@@ -370,8 +297,8 @@ void writeSingleRegister(uint8_t address, uint16_t data)
 //    DataStruct->channel6 = signExtend(&dataRx[0]);
 //    //crcWord = calculateCRC(&dataRx[0], bytesPerWord, crcWord);
 
-//#endif
-//#if (CHANNEL_COUNT > 7)
+// #endif
+// #if (CHANNEL_COUNT > 7)
 
 //    // Send 9th word, receive channel 8 data
 //    for (i = 0; i < bytesPerWord; i++)
@@ -381,7 +308,7 @@ void writeSingleRegister(uint8_t address, uint16_t data)
 //    DataStruct->channel7 = signExtend(&dataRx[0]);
 //    //crcWord = calculateCRC(&dataRx[0], bytesPerWord, crcWord);
 
-//#endif
+// #endif
 
 //    // Send the next word, receive CRC data
 //    for (i = 0; i < bytesPerWord; i++)
@@ -402,57 +329,168 @@ void writeSingleRegister(uint8_t address, uint16_t data)
 //    return ((bool) crcWord);
 //}
 
-
-
-
-bool readData(adc_channel_data *DataStruct, adc_voltage_data *VoltageData)
+void readDataRaw(adc_channel_data *DataStruct)
 {
     int i;
-    uint8_t crcTx[4] = { 0 };
-    uint8_t dataRx[4] = { 0 };
+    uint8_t dataRx[4] = {0};
     uint8_t bytesPerWord = getWordByteLength();
-    bool crcError = false; 
+
     setCS(LOW);
+
+    // Response word (Status)
+    for (i = 0; i < bytesPerWord; i++)
+    {
+        dataRx[i] = spiSendReceiveByte(0x00);
+    }
+    DataStruct->response = combineBytes(dataRx[0], dataRx[1]);
+
+    // Channel 0
+    for (i = 0; i < bytesPerWord; i++)
+    {
+        dataRx[i] = spiSendReceiveByte(0x00);
+    }
+    DataStruct->channel0 = signExtend(&dataRx[0]);
+
+#if (CHANNEL_COUNT > 1)
+    // Channel 1
+    for (i = 0; i < bytesPerWord; i++)
+    {
+        dataRx[i] = spiSendReceiveByte(0x00);
+    }
+    DataStruct->channel1 = signExtend(&dataRx[0]);
+#endif
+
+#if (CHANNEL_COUNT > 2)
+    // Channel 2
+    for (i = 0; i < bytesPerWord; i++)
+    {
+        dataRx[i] = spiSendReceiveByte(0x00);
+    }
+    DataStruct->channel2 = signExtend(&dataRx[0]);
+#endif
+
+#if (CHANNEL_COUNT > 3)
+    // Channel 3
+    for (i = 0; i < bytesPerWord; i++)
+    {
+        dataRx[i] = spiSendReceiveByte(0x00);
+    }
+    DataStruct->channel3 = signExtend(&dataRx[0]);
+#endif
+
+#if (CHANNEL_COUNT > 4)
+    // Channel 4
+    for (i = 0; i < bytesPerWord; i++)
+    {
+        dataRx[i] = spiSendReceiveByte(0x00);
+    }
+    DataStruct->channel4 = signExtend(&dataRx[0]);
+#endif
+
+#if (CHANNEL_COUNT > 5)
+    // Channel 5
+    for (i = 0; i < bytesPerWord; i++)
+    {
+        dataRx[i] = spiSendReceiveByte(0x00);
+    }
+    DataStruct->channel5 = signExtend(&dataRx[0]);
+#endif
+    setCS(HIGH);
+}
+
+
+bool readData(adc_channel_data *DataStruct, adc_angle_data *AngleData)
+{
+    int i;
+    uint8_t crcTx[4] = {0};
+    uint8_t dataRx[4] = {0};
+    uint8_t bytesPerWord = getWordByteLength();
+#ifdef ENABLE_CRC_IN
+    // Build CRC word (only if "RX_CRC_EN" register bit is enabled)
+    uint16_t crcWordIn = calculateCRC(&DataTx[0], bytesPerWord * 2, 0xFFFF);
+    crcTx[0] = upperByte(crcWordIn);
+    crcTx[1] = lowerByte(crcWordIn);
+#endif
+
+    setCS(LOW);
+
     // Send NULL word, receive response word (Status)
     for (i = 0; i < bytesPerWord; i++)
     {
         dataRx[i] = spiSendReceiveByte(0x00);
     }
     DataStruct->response = combineBytes(dataRx[0], dataRx[1]);
-    
-    // Calculate CRC (if enabled and applicable)
-    uint16_t crcWord = 0; // Or calculateCRC(&dataRx[0], bytesPerWord, 0xFFFF); if you want to include STATUS in CRC-OUT
+
+    // (OPTIONAL) Ignore CRC error checking
+    uint16_t crcWord = 0;
+    // uint16_t crcWord = calculateCRC(&dataRx[0], bytesPerWord, 0xFFFF);
 
     // --- Channel 0 data ---
     for (i = 0; i < bytesPerWord; i++)
     {
-        dataRx[i] = spiSendReceiveByte(crcTx[i]); // If CRC_IN is enabled, send CRC_IN word here
+        dataRx[i] = spiSendReceiveByte(crcTx[i]);
     }
     DataStruct->channel0 = signExtend(&dataRx[0]);
-    // Convert raw data to voltage for CH0
-    VoltageData->voltage[0] = ((float)DataStruct->channel0 / ADC_MAX_CODE) * (VREF_VOLTAGE / PGA_GAIN_CH0);
-    // crcWord = calculateCRC(&dataRx[0], bytesPerWord, crcWord); // If including CH0 in CRC-OUT
+    AngleData->angle[0] = ((float)DataStruct->channel0 / ADC_MAX_CODE) * (ANGLE_RANGE / PGA_GAIN_CH0);
+    // crcWord = calculateCRC(&dataRx[0], bytesPerWord, crcWord);
 
 #if (CHANNEL_COUNT > 1)
     // --- Channel 1 data ---
     for (i = 0; i < bytesPerWord; i++)
     {
-        dataRx[i] = spiSendReceiveByte(0x00);
+        dataRx[i] = spiSendReceiveByte(crcTx[i]);
     }
     DataStruct->channel1 = signExtend(&dataRx[0]);
-    VoltageData->voltage[1] = ((float)DataStruct->channel1 / ADC_MAX_CODE) * (VREF_VOLTAGE / PGA_GAIN_CH1); // Use PGA_GAIN_CH1
+    AngleData->angle[1] = ((float)DataStruct->channel1 / ADC_MAX_CODE) * (ANGLE_RANGE / PGA_GAIN_CH1);
     // crcWord = calculateCRC(&dataRx[0], bytesPerWord, crcWord);
 #endif
+
+#if (CHANNEL_COUNT > 2)
+    // --- Channel 2 data ---
     for (i = 0; i < bytesPerWord; i++)
     {
-        dataRx[i] = spiSendReceiveByte(0x00);
+        dataRx[i] = spiSendReceiveByte(crcTx[i]);
     }
-    DataStruct->crc = combineBytes(dataRx[0], dataRx[1]);
+    DataStruct->channel2 = signExtend(&dataRx[0]);
+    AngleData->angle[2] = ((float)DataStruct->channel2 / ADC_MAX_CODE) * (ANGLE_RANGE / PGA_GAIN_CH2);
+    // crcWord = calculateCRC(&dataRx[0], bytesPerWord, crcWord);
+#endif
+
+#if (CHANNEL_COUNT > 3)
+    // --- Channel 3 data ---
+    for (i = 0; i < bytesPerWord; i++)
+    {
+        dataRx[i] = spiSendReceiveByte(crcTx[i]);
+    }
+    DataStruct->channel3 = signExtend(&dataRx[0]);
+    AngleData->angle[3] = ((float)DataStruct->channel3 / ADC_MAX_CODE) * (ANGLE_RANGE / PGA_GAIN_CH3);
+    // crcWord = calculateCRC(&dataRx[0], bytesPerWord, crcWord);
+#endif
+
+#if (CHANNEL_COUNT > 4)
+    // --- Channel 4 data ---
+    for (i = 0; i < bytesPerWord; i++)
+    {
+        dataRx[i] = spiSendReceiveByte(crcTx[i]);
+    }
+    DataStruct->channel4 = signExtend(&dataRx[0]);
+    AngleData->angle[4] = ((float)DataStruct->channel4 / ADC_MAX_CODE) * (ANGLE_RANGE / PGA_GAIN_CH4);
+    // crcWord = calculateCRC(&dataRx[0], bytesPerWord, crcWord);
+#endif
+
+#if (CHANNEL_COUNT > 5)
+    // --- Channel 5 data ---
+    for (i = 0; i < bytesPerWord; i++)
+    {
+        dataRx[i] = spiSendReceiveByte(crcTx[i]);
+    }
+    DataStruct->channel5 = signExtend(&dataRx[0]);
+    AngleData->angle[5] = ((float)DataStruct->channel5 / ADC_MAX_CODE) * (ANGLE_RANGE / PGA_GAIN_CH5);
+    // crcWord = calculateCRC(&dataRx[0], bytesPerWord, crcWord);
+#endif
     setCS(HIGH);
-
-    return crcError; // Return true if a CRC error occurred
+    return ((bool)crcWord);
 }
-
 
 //*****************************************************************************
 //
@@ -471,19 +509,19 @@ bool readData(adc_channel_data *DataStruct, adc_voltage_data *VoltageData)
 uint16_t sendCommand(uint16_t opcode)
 {
     /* Assert if this function is used to send any of the following opcodes */
-    assert(OPCODE_RREG != opcode);      /* Use "readSingleRegister()"   */
-    assert(OPCODE_WREG != opcode);      /* Use "writeSingleRegister()"  */
-    assert(OPCODE_LOCK != opcode);      /* Use "lockRegisters()"        */
-    assert(OPCODE_UNLOCK != opcode);    /* Use "unlockRegisters()"      */
-    assert(OPCODE_RESET != opcode);     /* Use "resetDevice()"          */
+    assert(OPCODE_RREG != opcode);   /* Use "readSingleRegister()"   */
+    assert(OPCODE_WREG != opcode);   /* Use "writeSingleRegister()"  */
+    assert(OPCODE_LOCK != opcode);   /* Use "lockRegisters()"        */
+    assert(OPCODE_UNLOCK != opcode); /* Use "unlockRegisters()"      */
+    assert(OPCODE_RESET != opcode);  /* Use "resetDevice()"          */
 
     // Build TX and RX byte array
 #ifdef ENABLE_CRC_IN
-    uint8_t dataTx[8] = { 0 };      // 2 words, up to 4 bytes each = 8 bytes maximum
-    uint8_t dataRx[8] = { 0 };
+    uint8_t dataTx[8] = {0}; // 2 words, up to 4 bytes each = 8 bytes maximum
+    uint8_t dataRx[8] = {0};
 #else
-    uint8_t dataTx[4] = { 0 };      // 1 word, up to 4 bytes long = 4 bytes maximum
-    uint8_t dataRx[4] = { 0 };
+    uint8_t dataTx[4] = {0}; // 1 word, up to 4 bytes long = 4 bytes maximum
+    uint8_t dataRx[4] = {0};
 #endif
     uint8_t numberOfBytes = buildSPIarray(&opcode, 1, dataTx);
 
@@ -494,7 +532,7 @@ uint16_t sendCommand(uint16_t opcode)
     int i;
     for (i = 0; i < numberOfBytes; i++)
     {
-       dataRx[i] = spiSendReceiveByte(dataTx[i]);
+        dataRx[i] = spiSendReceiveByte(dataTx[i]);
     }
 
     /* Set the nCS pin HIGH */
@@ -504,8 +542,6 @@ uint16_t sendCommand(uint16_t opcode)
     uint16_t adcResponse = combineBytes(dataRx[0], dataRx[1]);
     return adcResponse;
 }
-
-
 
 //*****************************************************************************
 //
@@ -523,17 +559,17 @@ void resetDevice(void)
 {
     // Build TX and RX byte array
 #ifdef ENABLE_CRC_IN
-    uint8_t dataTx[8] = { 0 };      // 2 words, up to 4 bytes each = 8 bytes maximum
-    //uint8_t dataRx[8] = { 0 };    // Only needed if capturing data
+    uint8_t dataTx[8] = {0}; // 2 words, up to 4 bytes each = 8 bytes maximum
+    // uint8_t dataRx[8] = { 0 };    // Only needed if capturing data
 #else
-    uint8_t dataTx[4] = { 0 };      // 1 word, up to 4 bytes long = 4 bytes maximum
-    //uint8_t dataRx[4] = { 0 };    // Only needed if capturing data
+    uint8_t dataTx[4] = {0}; // 1 word, up to 4 bytes long = 4 bytes maximum
+    // uint8_t dataRx[4] = { 0 };    // Only needed if capturing data
 #endif
-    uint16_t opcode         = OPCODE_RESET;
-    uint8_t numberOfBytes   = buildSPIarray(&opcode, 1, dataTx);
+    uint16_t opcode = OPCODE_RESET;
+    uint8_t numberOfBytes = buildSPIarray(&opcode, 1, dataTx);
 
-    uint8_t bytesPerWord    = wlength_byte_values[WLENGTH];
-    uint8_t wordsInFrame    = CHANNEL_COUNT + 2;
+    uint8_t bytesPerWord = wlength_byte_values[WLENGTH];
+    uint8_t wordsInFrame = CHANNEL_COUNT + 2;
 
     // Set the nCS pin LOW
     setCS(LOW);
@@ -542,7 +578,7 @@ void resetDevice(void)
     int i;
     for (i = 0; i < numberOfBytes; i++)
     {
-         spiSendReceiveByte(dataTx[i]);
+        spiSendReceiveByte(dataTx[i]);
     }
 
     // Finish sending remaining bytes
@@ -568,8 +604,6 @@ void resetDevice(void)
     writeSingleRegister(MODE_ADDRESS, MODE_DEFAULT);
 }
 
-
-
 //*****************************************************************************
 //
 //! Sends the LOCK command and verifies that registers are locked.
@@ -585,14 +619,14 @@ bool lockRegisters(void)
 
     // Build TX and RX byte array
 #ifdef ENABLE_CRC_IN
-    uint8_t dataTx[8] = { 0 };      // 2 words, up to 4 bytes each = 8 bytes maximum
-    uint8_t dataRx[8] = { 0 };
+    uint8_t dataTx[8] = {0}; // 2 words, up to 4 bytes each = 8 bytes maximum
+    uint8_t dataRx[8] = {0};
 #else
-    uint8_t dataTx[4] = { 0 };      // 1 word, up to 4 bytes long = 4 bytes maximum
-    uint8_t dataRx[4] = { 0 };
+    uint8_t dataTx[4] = {0}; // 1 word, up to 4 bytes long = 4 bytes maximum
+    uint8_t dataRx[4] = {0};
 #endif
-    uint16_t opcode         = OPCODE_LOCK;
-    uint8_t numberOfBytes   = buildSPIarray(&opcode, 1, dataTx);
+    uint16_t opcode = OPCODE_LOCK;
+    uint8_t numberOfBytes = buildSPIarray(&opcode, 1, dataTx);
 
     // Send command
     spiSendReceiveArrays(dataTx, dataRx, numberOfBytes);
@@ -601,11 +635,14 @@ bool lockRegisters(void)
 
     /* (OPTIONAL) Read back the STATUS register and check if LOCK bit is set... */
     readSingleRegister(STATUS_ADDRESS);
-    if (!SPI_LOCKED) { b_lock_error = true; }
+    if (!SPI_LOCKED)
+    {
+        b_lock_error = true;
+    }
 
     /* If the STATUS register is NOT read back,
      * then make sure to manually update the global register map variable... */
-    //registerMap[STATUS_ADDRESS]  |= STATUS_LOCK_LOCKED;
+    // registerMap[STATUS_ADDRESS]  |= STATUS_LOCK_LOCKED;
 
     /* (OPTIONAL) Error handler */
     if (b_lock_error)
@@ -615,8 +652,6 @@ bool lockRegisters(void)
 
     return b_lock_error;
 }
-
-
 
 //*****************************************************************************
 //
@@ -629,15 +664,15 @@ bool lockRegisters(void)
 //*****************************************************************************
 bool unlockRegisters(void)
 {
-	bool b_unlock_error;
+    bool b_unlock_error;
 
     // Build TX and RX byte array
 #ifdef ENABLE_CRC_IN
-    uint8_t dataTx[8] = { 0 };      // 2 words, up to 4 bytes each = 8 bytes maximum
-    uint8_t dataRx[8] = { 0 };
+    uint8_t dataTx[8] = {0}; // 2 words, up to 4 bytes each = 8 bytes maximum
+    uint8_t dataRx[8] = {0};
 #else
-    uint8_t dataTx[4] = { 0 };      // 1 word, up to 4 bytes long = 4 bytes maximum
-    uint8_t dataRx[4] = { 0 };
+    uint8_t dataTx[4] = {0}; // 1 word, up to 4 bytes long = 4 bytes maximum
+    uint8_t dataRx[4] = {0};
 #endif
     uint16_t opcode = OPCODE_UNLOCK;
     uint8_t numberOfBytes = buildSPIarray(&opcode, 1, dataTx);
@@ -649,11 +684,14 @@ bool unlockRegisters(void)
 
     /* (OPTIONAL) Read the STATUS register and check if LOCK bit is cleared... */
     readSingleRegister(STATUS_ADDRESS);
-    if (SPI_LOCKED) { b_unlock_error = true; }
+    if (SPI_LOCKED)
+    {
+        b_unlock_error = true;
+    }
 
     /* If the STATUS register is NOT read back,
      * then make sure to manually update the global register map variable... */
-    //registerMap[STATUS_ADDRESS]  &= !STATUS_LOCK_LOCKED;
+    // registerMap[STATUS_ADDRESS]  &= !STATUS_LOCK_LOCKED;
 
     /* (OPTIONAL) Error handler */
     if (b_unlock_error)
@@ -663,8 +701,6 @@ bool unlockRegisters(void)
 
     return b_unlock_error;
 }
-
-
 
 //*****************************************************************************
 //
@@ -683,65 +719,63 @@ bool unlockRegisters(void)
 //*****************************************************************************
 uint16_t calculateCRC(const uint8_t dataBytes[], uint8_t numberBytes, uint16_t initialValue)
 {
-	/* Check that "dataBytes" is not a null pointer */
-	assert(dataBytes != 0x00);
+    /* Check that "dataBytes" is not a null pointer */
+    assert(dataBytes != 0x00);
 
-	int         bitIndex, byteIndex;
-	bool        dataMSb;						/* Most significant bit of data byte */
-	bool        crcMSb;						    /* Most significant bit of crc byte  */
-	uint8_t     bytesPerWord = wlength_byte_values[WLENGTH];
+    int bitIndex, byteIndex;
+    bool dataMSb; /* Most significant bit of data byte */
+    bool crcMSb;  /* Most significant bit of crc byte  */
+    uint8_t bytesPerWord = wlength_byte_values[WLENGTH];
 
-	/*
+    /*
      * Initial value of crc register
      * NOTE: The ADS131M0x defaults to 0xFFFF,
      * but can be set at function call to continue an on-going calculation
      */
     uint16_t crc = initialValue;
 
-    #ifdef CRC_CCITT
+#ifdef CRC_CCITT
     /* CCITT CRC polynomial = x^16 + x^12 + x^5 + 1 */
     const uint16_t poly = 0x1021;
-    #endif
+#endif
 
-    #ifdef CRC_ANSI
+#ifdef CRC_ANSI
     /* ANSI CRC polynomial = x^16 + x^15 + x^2 + 1 */
     const uint16_t poly = 0x8005;
-    #endif
+#endif
 
     //
     // CRC algorithm
     //
 
     // Loop through all bytes in the dataBytes[] array
-	for (byteIndex = 0; byteIndex < numberBytes; byteIndex++)
-	{
-	    // Point to MSb in byte
-	    bitIndex = 0x80u;
+    for (byteIndex = 0; byteIndex < numberBytes; byteIndex++)
+    {
+        // Point to MSb in byte
+        bitIndex = 0x80u;
 
-	    // Loop through all bits in the current byte
-	    while (bitIndex > 0)
-	    {
-	        // Check MSB's of data and crc
-	        dataMSb = (bool) (dataBytes[byteIndex] & bitIndex);
-	        crcMSb  = (bool) (crc & 0x8000u);
+        // Loop through all bits in the current byte
+        while (bitIndex > 0)
+        {
+            // Check MSB's of data and crc
+            dataMSb = (bool)(dataBytes[byteIndex] & bitIndex);
+            crcMSb = (bool)(crc & 0x8000u);
 
-	        crc <<= 1;              /* Left shift CRC register */
+            crc <<= 1; /* Left shift CRC register */
 
-	        // Check if XOR operation of MSBs results in additional XOR operations
-	        if (dataMSb ^ crcMSb)
-	        {
-	            crc ^= poly;        /* XOR crc with polynomial */
-	        }
+            // Check if XOR operation of MSBs results in additional XOR operations
+            if (dataMSb ^ crcMSb)
+            {
+                crc ^= poly; /* XOR crc with polynomial */
+            }
 
-	        /* Shift MSb pointer to the next data bit */
-	        bitIndex >>= 1;
-	    }
-	}
+            /* Shift MSb pointer to the next data bit */
+            bitIndex >>= 1;
+        }
+    }
 
-	return crc;
+    return crc;
 }
-
-
 
 //*****************************************************************************
 //
@@ -768,80 +802,77 @@ uint16_t calculateCRC(const uint8_t dataBytes[], uint8_t numberBytes, uint16_t i
 //*****************************************************************************
 void restoreRegisterDefaults(void)
 {
-    registerMap[ID_ADDRESS]             =   0x00;               /* NOTE: This a read-only register */
-    registerMap[STATUS_ADDRESS]         =   STATUS_DEFAULT;
-    registerMap[MODE_ADDRESS]           =   MODE_DEFAULT;
-    registerMap[CLOCK_ADDRESS]          =   CLOCK_DEFAULT;
-    registerMap[GAIN1_ADDRESS]          =   GAIN1_DEFAULT;
-    registerMap[GAIN2_ADDRESS]          =   GAIN2_DEFAULT;
-    registerMap[CFG_ADDRESS]            =   CFG_DEFAULT;
-    registerMap[THRSHLD_MSB_ADDRESS]    =   THRSHLD_MSB_DEFAULT;
-    registerMap[THRSHLD_LSB_ADDRESS]    =   THRSHLD_LSB_DEFAULT;
-    registerMap[CH0_CFG_ADDRESS]        =   CH0_CFG_DEFAULT;
-    registerMap[CH0_OCAL_MSB_ADDRESS]   =   CH0_OCAL_MSB_DEFAULT;
-    registerMap[CH0_OCAL_LSB_ADDRESS]   =   CH0_OCAL_LSB_DEFAULT;
-    registerMap[CH0_GCAL_MSB_ADDRESS]   =   CH0_GCAL_MSB_DEFAULT;
-    registerMap[CH0_GCAL_LSB_ADDRESS]   =   CH0_GCAL_LSB_DEFAULT;
+    registerMap[ID_ADDRESS] = 0x00; /* NOTE: This a read-only register */
+    registerMap[STATUS_ADDRESS] = STATUS_DEFAULT;
+    registerMap[MODE_ADDRESS] = MODE_DEFAULT;
+    registerMap[CLOCK_ADDRESS] = CLOCK_DEFAULT;
+    registerMap[GAIN1_ADDRESS] = GAIN1_DEFAULT;
+    registerMap[GAIN2_ADDRESS] = GAIN2_DEFAULT;
+    registerMap[CFG_ADDRESS] = CFG_DEFAULT;
+    registerMap[THRSHLD_MSB_ADDRESS] = THRSHLD_MSB_DEFAULT;
+    registerMap[THRSHLD_LSB_ADDRESS] = THRSHLD_LSB_DEFAULT;
+    registerMap[CH0_CFG_ADDRESS] = CH0_CFG_DEFAULT;
+    registerMap[CH0_OCAL_MSB_ADDRESS] = CH0_OCAL_MSB_DEFAULT;
+    registerMap[CH0_OCAL_LSB_ADDRESS] = CH0_OCAL_LSB_DEFAULT;
+    registerMap[CH0_GCAL_MSB_ADDRESS] = CH0_GCAL_MSB_DEFAULT;
+    registerMap[CH0_GCAL_LSB_ADDRESS] = CH0_GCAL_LSB_DEFAULT;
 #if (CHANNEL_COUNT > 1)
-    registerMap[CH1_CFG_ADDRESS]        =   CH1_CFG_DEFAULT;
-    registerMap[CH1_OCAL_MSB_ADDRESS]   =   CH1_OCAL_MSB_DEFAULT;
-    registerMap[CH1_OCAL_LSB_ADDRESS]   =   CH1_OCAL_LSB_DEFAULT;
-    registerMap[CH1_GCAL_MSB_ADDRESS]   =   CH1_GCAL_MSB_DEFAULT;
-    registerMap[CH1_GCAL_LSB_ADDRESS]   =   CH1_GCAL_LSB_DEFAULT;
+    registerMap[CH1_CFG_ADDRESS] = CH1_CFG_DEFAULT;
+    registerMap[CH1_OCAL_MSB_ADDRESS] = CH1_OCAL_MSB_DEFAULT;
+    registerMap[CH1_OCAL_LSB_ADDRESS] = CH1_OCAL_LSB_DEFAULT;
+    registerMap[CH1_GCAL_MSB_ADDRESS] = CH1_GCAL_MSB_DEFAULT;
+    registerMap[CH1_GCAL_LSB_ADDRESS] = CH1_GCAL_LSB_DEFAULT;
 #endif
 #if (CHANNEL_COUNT > 2)
-    registerMap[CH2_CFG_ADDRESS]        =   CH2_CFG_DEFAULT;
-    registerMap[CH2_OCAL_MSB_ADDRESS]   =   CH2_OCAL_MSB_DEFAULT;
-    registerMap[CH2_OCAL_LSB_ADDRESS]   =   CH2_OCAL_LSB_DEFAULT;
-    registerMap[CH2_GCAL_MSB_ADDRESS]   =   CH2_GCAL_MSB_DEFAULT;
-    registerMap[CH2_GCAL_LSB_ADDRESS]   =   CH2_GCAL_LSB_DEFAULT;
+    registerMap[CH2_CFG_ADDRESS] = CH2_CFG_DEFAULT;
+    registerMap[CH2_OCAL_MSB_ADDRESS] = CH2_OCAL_MSB_DEFAULT;
+    registerMap[CH2_OCAL_LSB_ADDRESS] = CH2_OCAL_LSB_DEFAULT;
+    registerMap[CH2_GCAL_MSB_ADDRESS] = CH2_GCAL_MSB_DEFAULT;
+    registerMap[CH2_GCAL_LSB_ADDRESS] = CH2_GCAL_LSB_DEFAULT;
 #endif
 #if (CHANNEL_COUNT > 3)
-    registerMap[CH3_CFG_ADDRESS]        =   CH3_CFG_DEFAULT;
-    registerMap[CH3_OCAL_MSB_ADDRESS]   =   CH3_OCAL_MSB_DEFAULT;
-    registerMap[CH3_OCAL_LSB_ADDRESS]   =   CH3_OCAL_LSB_DEFAULT;
-    registerMap[CH3_GCAL_MSB_ADDRESS]   =   CH3_GCAL_MSB_DEFAULT;
-    registerMap[CH3_GCAL_LSB_ADDRESS]   =   CH3_GCAL_LSB_DEFAULT;
+    registerMap[CH3_CFG_ADDRESS] = CH3_CFG_DEFAULT;
+    registerMap[CH3_OCAL_MSB_ADDRESS] = CH3_OCAL_MSB_DEFAULT;
+    registerMap[CH3_OCAL_LSB_ADDRESS] = CH3_OCAL_LSB_DEFAULT;
+    registerMap[CH3_GCAL_MSB_ADDRESS] = CH3_GCAL_MSB_DEFAULT;
+    registerMap[CH3_GCAL_LSB_ADDRESS] = CH3_GCAL_LSB_DEFAULT;
 #endif
 #if (CHANNEL_COUNT > 4)
-    registerMap[CH4_CFG_ADDRESS]        =   CH4_CFG_DEFAULT;
-    registerMap[CH4_OCAL_MSB_ADDRESS]   =   CH4_OCAL_MSB_DEFAULT;
-    registerMap[CH4_OCAL_LSB_ADDRESS]   =   CH4_OCAL_LSB_DEFAULT;
-    registerMap[CH4_GCAL_MSB_ADDRESS]   =   CH4_GCAL_MSB_DEFAULT;
-    registerMap[CH4_GCAL_LSB_ADDRESS]   =   CH4_GCAL_LSB_DEFAULT;
+    registerMap[CH4_CFG_ADDRESS] = CH4_CFG_DEFAULT;
+    registerMap[CH4_OCAL_MSB_ADDRESS] = CH4_OCAL_MSB_DEFAULT;
+    registerMap[CH4_OCAL_LSB_ADDRESS] = CH4_OCAL_LSB_DEFAULT;
+    registerMap[CH4_GCAL_MSB_ADDRESS] = CH4_GCAL_MSB_DEFAULT;
+    registerMap[CH4_GCAL_LSB_ADDRESS] = CH4_GCAL_LSB_DEFAULT;
 #endif
 #if (CHANNEL_COUNT > 5)
-    registerMap[CH5_CFG_ADDRESS]        =   CH5_CFG_DEFAULT;
-    registerMap[CH5_OCAL_MSB_ADDRESS]   =   CH5_OCAL_MSB_DEFAULT;
-    registerMap[CH5_OCAL_LSB_ADDRESS]   =   CH5_OCAL_LSB_DEFAULT;
-    registerMap[CH5_GCAL_MSB_ADDRESS]   =   CH5_GCAL_MSB_DEFAULT;
-    registerMap[CH5_GCAL_LSB_ADDRESS]   =   CH5_GCAL_LSB_DEFAULT;
+    registerMap[CH5_CFG_ADDRESS] = CH5_CFG_DEFAULT;
+    registerMap[CH5_OCAL_MSB_ADDRESS] = CH5_OCAL_MSB_DEFAULT;
+    registerMap[CH5_OCAL_LSB_ADDRESS] = CH5_OCAL_LSB_DEFAULT;
+    registerMap[CH5_GCAL_MSB_ADDRESS] = CH5_GCAL_MSB_DEFAULT;
+    registerMap[CH5_GCAL_LSB_ADDRESS] = CH5_GCAL_LSB_DEFAULT;
 #endif
 #if (CHANNEL_COUNT > 6)
-    registerMap[CH6_CFG_ADDRESS]        =   CH6_CFG_DEFAULT;
-    registerMap[CH6_OCAL_MSB_ADDRESS]   =   CH6_OCAL_MSB_DEFAULT;
-    registerMap[CH6_OCAL_LSB_ADDRESS]   =   CH6_OCAL_LSB_DEFAULT;
-    registerMap[CH6_GCAL_MSB_ADDRESS]   =   CH6_GCAL_MSB_DEFAULT;
-    registerMap[CH6_GCAL_LSB_ADDRESS]   =   CH6_GCAL_LSB_DEFAULT;
+    registerMap[CH6_CFG_ADDRESS] = CH6_CFG_DEFAULT;
+    registerMap[CH6_OCAL_MSB_ADDRESS] = CH6_OCAL_MSB_DEFAULT;
+    registerMap[CH6_OCAL_LSB_ADDRESS] = CH6_OCAL_LSB_DEFAULT;
+    registerMap[CH6_GCAL_MSB_ADDRESS] = CH6_GCAL_MSB_DEFAULT;
+    registerMap[CH6_GCAL_LSB_ADDRESS] = CH6_GCAL_LSB_DEFAULT;
 #endif
 #if (CHANNEL_COUNT > 7)
-    registerMap[CH7_CFG_ADDRESS]        =   CH7_CFG_DEFAULT;
-    registerMap[CH7_OCAL_MSB_ADDRESS]   =   CH7_OCAL_MSB_DEFAULT;
-    registerMap[CH7_OCAL_LSB_ADDRESS]   =   CH7_OCAL_LSB_DEFAULT;
-    registerMap[CH7_GCAL_MSB_ADDRESS]   =   CH7_GCAL_MSB_DEFAULT;
-    registerMap[CH7_GCAL_LSB_ADDRESS]   =   CH7_GCAL_LSB_DEFAULT;
+    registerMap[CH7_CFG_ADDRESS] = CH7_CFG_DEFAULT;
+    registerMap[CH7_OCAL_MSB_ADDRESS] = CH7_OCAL_MSB_DEFAULT;
+    registerMap[CH7_OCAL_LSB_ADDRESS] = CH7_OCAL_LSB_DEFAULT;
+    registerMap[CH7_GCAL_MSB_ADDRESS] = CH7_GCAL_MSB_DEFAULT;
+    registerMap[CH7_GCAL_LSB_ADDRESS] = CH7_GCAL_LSB_DEFAULT;
 #endif
-    registerMap[REGMAP_CRC_ADDRESS]     =   REGMAP_CRC_DEFAULT;
+    registerMap[REGMAP_CRC_ADDRESS] = REGMAP_CRC_DEFAULT;
 }
-
-
 
 //****************************************************************************
 //
 // Helper functions
 //
 //****************************************************************************
-
 
 //*****************************************************************************
 //
@@ -857,12 +888,10 @@ void restoreRegisterDefaults(void)
 uint8_t upperByte(uint16_t uint16_Word)
 {
     uint8_t msByte;
-    msByte = (uint8_t) ((uint16_Word >> 8) & 0x00FF);
+    msByte = (uint8_t)((uint16_Word >> 8) & 0x00FF);
 
     return msByte;
 }
-
-
 
 //*****************************************************************************
 //
@@ -878,12 +907,10 @@ uint8_t upperByte(uint16_t uint16_Word)
 uint8_t lowerByte(uint16_t uint16_Word)
 {
     uint8_t lsByte;
-    lsByte = (uint8_t) (uint16_Word & 0x00FF);
+    lsByte = (uint8_t)(uint16_Word & 0x00FF);
 
     return lsByte;
 }
-
-
 
 //*****************************************************************************
 //
@@ -900,12 +927,10 @@ uint8_t lowerByte(uint16_t uint16_Word)
 uint16_t combineBytes(uint8_t upperByte, uint8_t lowerByte)
 {
     uint16_t combinedValue;
-    combinedValue = ((uint16_t) upperByte << 8) | ((uint16_t) lowerByte);
+    combinedValue = ((uint16_t)upperByte << 8) | ((uint16_t)lowerByte);
 
     return combinedValue;
 }
-
-
 
 //*****************************************************************************
 //
@@ -923,47 +948,44 @@ int32_t signExtend(const uint8_t dataBytes[])
 
 #ifdef WORD_LENGTH_24BIT
 
-    int32_t upperByte   = ((int32_t) dataBytes[0] << 24);
-    int32_t middleByte  = ((int32_t) dataBytes[1] << 16);
-    int32_t lowerByte   = ((int32_t) dataBytes[2] << 8);
+    int32_t upperByte = ((int32_t)dataBytes[0] << 24);
+    int32_t middleByte = ((int32_t)dataBytes[1] << 16);
+    int32_t lowerByte = ((int32_t)dataBytes[2] << 8);
 
-    return (((int32_t) (upperByte | middleByte | lowerByte)) >> 8);     // Right-shift of signed data maintains signed bit
+    return (((int32_t)(upperByte | middleByte | lowerByte)) >> 8); // Right-shift of signed data maintains signed bit
 
 #elif defined WORD_LENGTH_32BIT_SIGN_EXTEND
 
-    int32_t signByte    = ((int32_t) dataBytes[0] << 24);
-    int32_t upperByte   = ((int32_t) dataBytes[1] << 16);
-    int32_t middleByte  = ((int32_t) dataBytes[2] << 8);
-    int32_t lowerByte   = ((int32_t) dataBytes[3] << 0);
+    int32_t signByte = ((int32_t)dataBytes[0] << 24);
+    int32_t upperByte = ((int32_t)dataBytes[1] << 16);
+    int32_t middleByte = ((int32_t)dataBytes[2] << 8);
+    int32_t lowerByte = ((int32_t)dataBytes[3] << 0);
 
     return (signByte | upperByte | middleByte | lowerByte);
 
 #elif defined WORD_LENGTH_32BIT_ZERO_PADDED
 
-    int32_t upperByte   = ((int32_t) dataBytes[0] << 24);
-    int32_t middleByte  = ((int32_t) dataBytes[1] << 16);
-    int32_t lowerByte   = ((int32_t) dataBytes[2] << 8);
+    int32_t upperByte = ((int32_t)dataBytes[0] << 24);
+    int32_t middleByte = ((int32_t)dataBytes[1] << 16);
+    int32_t lowerByte = ((int32_t)dataBytes[2] << 8);
 
-    return (((int32_t) (upperByte | middleByte | lowerByte)) >> 8);     // Right-shift of signed data maintains signed bit
+    return (((int32_t)(upperByte | middleByte | lowerByte)) >> 8); // Right-shift of signed data maintains signed bit
 
 #elif defined WORD_LENGTH_16BIT_TRUNCATED
 
-    int32_t upperByte   = ((int32_t) dataBytes[0] << 24);
-    int32_t lowerByte   = ((int32_t) dataBytes[1] << 16);
+    int32_t upperByte = ((int32_t)dataBytes[0] << 24);
+    int32_t lowerByte = ((int32_t)dataBytes[1] << 16);
 
-    return (((int32_t) (upperByte | lowerByte)) >> 16);                 // Right-shift of signed data maintains signed bit
+    return (((int32_t)(upperByte | lowerByte)) >> 16); // Right-shift of signed data maintains signed bit
 
 #endif
 }
-
-
 
 //****************************************************************************
 //
 // Internal functions
 //
 //****************************************************************************
-
 
 //*****************************************************************************
 //
@@ -988,9 +1010,9 @@ uint8_t buildSPIarray(const uint16_t opcodeArray[], uint8_t numberOpcodes, uint8
      * Number of bytes per word = 2, 3, or 4
      * Total bytes = bytes per word * number of words
      */
-    uint8_t numberWords     = numberOpcodes + (SPI_CRC_ENABLED ? 1 : 0);
-    uint8_t bytesPerWord    = getWordByteLength();
-    uint8_t numberOfBytes   = numberWords * bytesPerWord;
+    uint8_t numberWords = numberOpcodes + (SPI_CRC_ENABLED ? 1 : 0);
+    uint8_t bytesPerWord = getWordByteLength();
+    uint8_t numberOfBytes = numberWords * bytesPerWord;
 
     int i;
     for (i = 0; i < numberOpcodes; i++)
@@ -998,21 +1020,19 @@ uint8_t buildSPIarray(const uint16_t opcodeArray[], uint8_t numberOpcodes, uint8
         // NOTE: Be careful not to accidentally overflow the array here.
         // The array and opcodes are defined in the calling function, so
         // we are trusting that no mistakes were made in the calling function!
-        byteArray[(i*bytesPerWord) + 0] = upperByte(opcodeArray[i]);
-        byteArray[(i*bytesPerWord) + 1] = lowerByte(opcodeArray[i]);
+        byteArray[(i * bytesPerWord) + 0] = upperByte(opcodeArray[i]);
+        byteArray[(i * bytesPerWord) + 1] = lowerByte(opcodeArray[i]);
     }
 
 #ifdef ENABLE_CRC_IN
     // Calculate CRC and put it into TX array
     uint16_t crcWord = calculateCRC(&byteArray[0], numberOfBytes, 0xFFFF);
-    byteArray[(i*bytesPerWord) + 0] = upperByte(crcWord);
-    byteArray[(i*bytesPerWord) + 1] = lowerByte(crcWord);
+    byteArray[(i * bytesPerWord) + 0] = upperByte(crcWord);
+    byteArray[(i * bytesPerWord) + 1] = lowerByte(crcWord);
 #endif
 
     return numberOfBytes;
 }
-
-
 
 //*****************************************************************************
 //
@@ -1029,7 +1049,6 @@ uint8_t buildSPIarray(const uint16_t opcodeArray[], uint8_t numberOpcodes, uint8
 uint16_t enforce_selected_device_modes(uint16_t data)
 {
 
-
     ///////////////////////////////////////////////////////////////////////////
     // Enforce RX_CRC_EN setting
 
@@ -1040,7 +1059,6 @@ uint16_t enforce_selected_device_modes(uint16_t data)
     // When writing to the MODE register, ensure RX_CRC_EN bit is NEVER set
     data &= ~MODE_RX_CRC_EN_ENABLED;
 #endif // ENABLE_CRC_IN
-
 
     ///////////////////////////////////////////////////////////////////////////
     // Enforce WLENGH setting
@@ -1059,7 +1077,6 @@ uint16_t enforce_selected_device_modes(uint16_t data)
     data = (data & ~MODE_WLENGTH_MASK) | MODE_WLENGTH_16BIT;
 #endif
 
-
     ///////////////////////////////////////////////////////////////////////////
     // Enforce DRDY_FMT setting
 
@@ -1070,7 +1087,6 @@ uint16_t enforce_selected_device_modes(uint16_t data)
     // When writing to the MODE register, ensure DRDY_FMT bit is NEVER set
     data = (data & ~MODE_DRDY_FMT_MASK) | MODE_DRDY_FMT_LOGIC_LOW;
 #endif
-
 
     ///////////////////////////////////////////////////////////////////////////
     // Enforce CRC_TYPE setting
@@ -1086,8 +1102,6 @@ uint16_t enforce_selected_device_modes(uint16_t data)
     // Return modified register data
     return data;
 }
-
-
 
 //*****************************************************************************
 //
@@ -1106,3 +1120,22 @@ uint8_t getWordByteLength(void)
 {
     return wlength_byte_values[WLENGTH];
 }
+
+void convertToAngle(adc_channel_data *rawData, adc_angle_data *angleData)
+{
+    /*
+     * 转换公式: angle = (rawValue / ADC_MAX_CODE) * (ANGLE_RANGE / PGA_GAIN)
+     *
+     * ADC_MAX_CODE: ADC 最大码值，24位有符号数为 8388607 (0x7FFFFF)
+     * ANGLE_RANGE:  传感器角度量程
+     * PGA_GAIN:     各通道增益
+     */
+
+    angleData->angle[0] = ((float)rawData->channel0 / ADC_MAX_CODE) * (ANGLE_RANGE / PGA_GAIN_CH0);
+    angleData->angle[1] = ((float)rawData->channel1 / ADC_MAX_CODE) * (ANGLE_RANGE / PGA_GAIN_CH1);
+    angleData->angle[2] = ((float)rawData->channel2 / ADC_MAX_CODE) * (ANGLE_RANGE / PGA_GAIN_CH2);
+    angleData->angle[3] = ((float)rawData->channel3 / ADC_MAX_CODE) * (ANGLE_RANGE / PGA_GAIN_CH3);
+    angleData->angle[4] = ((float)rawData->channel4 / ADC_MAX_CODE) * (ANGLE_RANGE / PGA_GAIN_CH4);
+    angleData->angle[5] = ((float)rawData->channel5 / ADC_MAX_CODE) * (ANGLE_RANGE / PGA_GAIN_CH5);
+}
+
