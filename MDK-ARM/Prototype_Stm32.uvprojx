@@ -339,7 +339,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32F407xx</Define>
               <Undefine></Undefine>
-              <IncludePath>../Core/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F4xx/Include;../Drivers/CMSIS/Include;../Middlewares/Third_Party/FreeRTOS/Source/include;../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2;../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F;../Platform/FSM;../Code;../Platform/Motor;../Platform/SERIAL_FRAME</IncludePath>
+              <IncludePath>../Core/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F4xx/Include;../Drivers/CMSIS/Include;../Middlewares/Third_Party/FreeRTOS/Source/include;../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2;../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F;../Platform/FSM;../Code;../Platform/Motor;../Platform/SERIAL_FRAME;../Platform/M0603A</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1635,6 +1635,16 @@
               <FileType>1</FileType>
               <FilePath>..\Platform\IMU\lsm6dsv16x_reg.c</FilePath>
             </File>
+            <File>
+              <FileName>m0603a.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Platform\M0603A\m0603a.c</FilePath>
+            </File>
+            <File>
+              <FileName>m0603a_port.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Platform\M0603A\m0603a_port.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1644,6 +1654,11 @@
               <FileName>user_main.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Code\user_main.c</FilePath>
+            </File>
+            <File>
+              <FileName>motor_ctrl.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Code\motor_ctrl.c</FilePath>
             </File>
           </Files>
         </Group>

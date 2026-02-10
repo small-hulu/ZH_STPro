@@ -5,7 +5,7 @@
 
 static UART_HandleTypeDef *motor_uart;
 static MotorFeedback_t motor_fb[2];
-
+static MotorExtFeedback_t motor_ext_fb[2];
 /* ============= CRC8 MAXIM ============= */
 static uint8_t crc8_maxim(const uint8_t *data, uint8_t len)
 {
@@ -96,7 +96,7 @@ void Motor_RequestFeedback(uint8_t id)
     uint8_t f[10] = {id, MOTOR_CMD_READ};
     send_frame(f);
 }
-
+int16_t speed;
 /* ============= 解析反馈帧（兼容 A1 / 65） ============= */
 static void parse_frame(const uint8_t *f)
 {
@@ -107,12 +107,32 @@ static void parse_frame(const uint8_t *f)
     if (id < 1 || id > 2)
         return;
 
-    /* A1 & 65 两类帧结构类似 */
-    motor_fb[id - 1].speed       = (int16_t)((f[2] << 8) | f[3]);
-    motor_fb[id - 1].current     = (int16_t)((f[4] << 8) | f[5]);
-    motor_fb[id - 1].temperature = f[7];
-    motor_fb[id - 1].fault       = f[8];
+    uint8_t cmd = f[1];
+
+    if (cmd == MOTOR_CMD_READ || cmd == 0x65)
+    {
+        motor_fb[id - 1].speed =
+            (int16_t)((f[2] << 8) | f[3]);
+        motor_fb[id - 1].current =
+            (int16_t)((f[4] << 8) | f[5]);
+        motor_fb[id - 1].temperature = f[7];
+        motor_fb[id - 1].fault = f[8];
+    }
+    else if (cmd == 0x75)
+    {
+        motor_ext_fb[id - 1].lap_count =
+            ((int32_t)f[2] << 24) |
+            ((int32_t)f[3] << 16) |
+            ((int32_t)f[4] << 8)  |
+            ((int32_t)f[5]);
+
+        motor_ext_fb[id - 1].position =
+            ((uint16_t)f[6] << 8) | f[7];
+
+        motor_ext_fb[id - 1].fault = f[8];
+    }
 }
+
 
 /* ============= DMA-IDLE 进入此函数 ============= */
 void Motor_ProcessRxData(uint8_t *buf, uint16_t len)
@@ -127,6 +147,20 @@ void Motor_ProcessRxData(uint8_t *buf, uint16_t len)
    
     xUART2.RxNum = 0;
 }
+void Motor_RequestExtFeedback(uint8_t id)
+{
+    if (id < 1 || id > 2) return;
+
+    uint8_t f[10] = {0};
+
+    f[0] = id;
+    f[1] = MOTOR_CMD_MIL;
+
+    // DATA[2~8] 默认 0
+    f[9] = crc8_maxim(f, 9);
+
+    HAL_UART_Transmit(motor_uart, f, 10, 50);
+}
 
 /* ============= 提供给用户接口 ============= */
 uint8_t Motor_GetFeedback(MotorFeedback_t *fb, uint8_t id)
@@ -136,3 +170,10 @@ uint8_t Motor_GetFeedback(MotorFeedback_t *fb, uint8_t id)
     return 1;
 }
 
+uint8_t Motor_GetExtFeedback(MotorExtFeedback_t *fb, uint8_t id)
+{
+    if (id < 1 || id > 2) return 0;
+
+    memcpy(fb, &motor_ext_fb[id - 1], sizeof(MotorExtFeedback_t));
+    return 1;
+}

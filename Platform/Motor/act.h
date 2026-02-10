@@ -29,13 +29,14 @@ typedef struct {
 
 
 /* ====== 机器人参数 ====== */
-#define WHEEL_RADIUS_M 0.0375f
+#define WHEEL_RADIUS_M 0.0379f
 #define WHEEL_BASE_M   0.40f
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846f
 #endif
-
+#define MS_TO_RPM (60.0f / (2.0f * M_PI * WHEEL_RADIUS_M))
+#define RPM_TO_MPS      (2.0f * M_PI * WHEEL_RADIUS_M / 60.0f)
 extern xUART_TypeDef xUART2;
 
 #define STEPPER_FORWARD  0
@@ -58,5 +59,8 @@ void FeedBack();
 
 void ArmUpDown();
 void ArmFrontBack();
-void Motor_SetSpeed_FromCmd(const cmd_vel_t *cmd, uint8_t acc);
+void Motor_SetSpeed_FromCmd(const cmd_vel_t *cmd,
+                            uint8_t acc,
+                            float *v_left_out,
+                            float *v_right_out);
 #endif /* INC_ACT_H_ */

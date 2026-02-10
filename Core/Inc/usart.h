@@ -33,6 +33,7 @@ extern "C" {
 #include "queue.h"
 #include "user_main.h"
 extern QueueHandle_t uartQueue;
+extern QueueHandle_t uart2RxQueue;
 #define RX_BUF_LEN    256
 static uint8_t rx_buf[RX_BUF_LEN];
 
@@ -43,7 +44,10 @@ typedef struct {
     uint8_t  data[UART_FRAME_MAX_LEN];
 } uart_frame_t;
 
-
+typedef struct {
+    uint16_t len;
+    uint8_t  buf[64];
+} uart_tx_frame_t;
 /* USER CODE END Includes */
 
 extern UART_HandleTypeDef huart1;

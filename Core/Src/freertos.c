@@ -81,6 +81,13 @@ const osThreadAttr_t neckTask_attributes = {
   .stack_size = 512 * 4,
   .priority = (osPriority_t) osPriorityLow,
 };
+/* Definitions for motorRxTask */
+osThreadId_t motorRxTaskHandle;
+const osThreadAttr_t motorRxTask_attributes = {
+  .name = "motorRxTask",
+  .stack_size = 256 * 4,
+  .priority = (osPriority_t) osPriorityLow,
+};
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -91,6 +98,7 @@ typedef struct {
 
 QueueHandle_t neckQueue;
 QueueHandle_t uartQueue;
+QueueHandle_t uart2RxQueue;
 fsm_lib_return main_ctrl_fsm(fsm_lib_ctrl_handle *handle);
 fsm_lib_ctrl_handle main_ctrl_fsm_handle;
 
@@ -100,6 +108,7 @@ void StartDefaultTask(void *argument);
 void fun_ctrl_Task(void *argument);
 void Status_Task(void *argument);
 void NeckTask(void *argument);
+void MotorRxTask(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -134,6 +143,8 @@ void MX_FREERTOS_Init(void) {
 	configASSERT(uartQueue != NULL);
 	neckQueue = xQueueCreate(8, sizeof(neck_cmd_t)); 
 	configASSERT(neckQueue != NULL);
+	uart2RxQueue = xQueueCreate(8,sizeof(xUART_TypeDef));
+	configASSERT(uartQueue != NULL);
   /* USER CODE END RTOS_QUEUES */
 
   /* Create the thread(s) */
@@ -148,6 +159,9 @@ void MX_FREERTOS_Init(void) {
 
   /* creation of neckTask */
   neckTaskHandle = osThreadNew(NeckTask, NULL, &neckTask_attributes);
+
+  /* creation of motorRxTask */
+  motorRxTaskHandle = osThreadNew(MotorRxTask, NULL, &motorRxTask_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -169,6 +183,8 @@ serial_frame_t pkt;
 cmd_vel_t cmd;
 neck_cmd_t neck_cmd;
 uint8_t  cur_cmd;
+float v_left_ret  = 0.0f;
+float v_right_ret = 0.0f;
 /* USER CODE END Header_StartDefaultTask */
 void StartDefaultTask(void *argument)
 {
@@ -200,12 +216,19 @@ void StartDefaultTask(void *argument)
 									(int16_t)((pkt.data[2] << 8) | pkt.data[3]);
 
 					
-									  Motor_SetSpeed_FromCmd(&cmd, 18);
-									  //send cmd and v 
-										uint8_t ack_data[] = {0x00};
-										tx_len = serial_frame_build(0x81, ack_data, 1,tx_buf, sizeof(tx_buf));
-										HAL_UART_Transmit(&huart6, tx_buf, tx_len, 100);
-                    break;
+									  Motor_SetSpeed_FromCmd(&cmd, 18, &v_left_ret, &v_right_ret);
+										int16_t v_left_mm_s  = (int16_t)(v_left_ret  * 1000.0f);
+										int16_t v_right_mm_s = (int16_t)(v_right_ret * 1000.0f);
+
+										uint8_t ack_data[4];
+										ack_data[0] = v_left_mm_s >> 8;
+										ack_data[1] = v_left_mm_s & 0xFF;
+										ack_data[2] = v_right_mm_s >> 8;
+										ack_data[3] = v_right_mm_s & 0xFF;
+
+										tx_len = serial_frame_build(0x81,ack_data,sizeof(ack_data),tx_buf,sizeof(tx_buf));
+									  HAL_UART_Transmit(&huart6, tx_buf, tx_len, 100);
+										break;
 								}
                 
                 case 0x02:
@@ -314,32 +337,44 @@ void fun_ctrl_Task(void *argument)
   neck_cmd_t cmd;
 	Stop();
 	//GoAhead();
-	ArmWave();
-	Armidle1();
+	ArmGive();
 	osDelay(1000);
 	Armidle1();
 	osDelay(1000);
 	Armidle1();
+	osDelay(1000);
+	Armidle1();
+	osDelay(1000);
+	ArmRaise();
+	osDelay(1000);
 	ArmRaise1();
-		osDelay(1000);
+	osDelay(1000);
 	ArmRaise2();
-		osDelay(1000);
+	osDelay(1000);
 	ArmRaise3();
-		NeckUpDown();
+	NeckUpDown();
 	osDelay(3000);
-		NeckUpDown();
+	NeckUpDown();
   for(;;)
   {
-         // ??? -> ??
-//        cmd.angle       = end_angle;
-//        cmd.pitch_angle = pitch_end;
-//        xQueueSendToBack(neckQueue, &cmd, 0);
-//        osDelay(2000); // ???????
+//			Motor_RequestExtFeedback(1);
+//			if (Motor_GetExtFeedback(&ext, 1))
+//			{
+//					float angle_deg = Motor_PositionToDegree(ext.position);
+//					int32_t laps = ext.lap_count;
+//			}
+		
 
-//        // ??? -> ??
-//        cmd.angle       = start_angle;
-//        cmd.pitch_angle = pitch_start;
-//        xQueueSendToBack(neckQueue, &cmd, 0);
+
+        cmd.angle       = end_angle;
+        cmd.pitch_angle = pitch_end;
+        xQueueSendToBack(neckQueue, &cmd, 0);
+        osDelay(1000); // ???????
+
+        // ??? -> ??
+        cmd.angle       = start_angle;
+        cmd.pitch_angle = pitch_start;
+        xQueueSendToBack(neckQueue, &cmd, 0);
         osDelay(1000);
   }
   /* USER CODE END fun_ctrl_Task */
@@ -366,10 +401,9 @@ void Status_Task(void *argument)
 	
 	lsm6dsv16x_filt_settling_mask_t filt_settling_mask;
 	lsm6dsv16x_data_ready_t drdy;
-	uint8_t imu_data[12];
+	uint8_t imu_data[16];
 	int16_t data_raw_temperature;
-    
-	uint8_t i2ctimes;
+  
 		
 	float acceleration_mg[3];
 	float angular_rate_mdps[3];
@@ -378,7 +412,9 @@ void Status_Task(void *argument)
     
   lsm6dsv16x_xl_full_scale_set(&atk_ms6dsv, LSM6DSV16X_2g);
   lsm6dsv16x_gy_full_scale_set(&atk_ms6dsv, LSM6DSV16X_2000dps);
-    
+   
+	lsm6dsv16x_timestamp_set(&atk_ms6dsv, PROPERTY_ENABLE);
+
   filt_settling_mask.drdy = PROPERTY_ENABLE;
   filt_settling_mask.irq_xl = PROPERTY_ENABLE;
   filt_settling_mask.irq_g = PROPERTY_ENABLE;
@@ -393,63 +429,69 @@ void Status_Task(void *argument)
   for(;;)
   {
 		//touch senior  todo
-		uint32_t now = osKernelGetTickCount();
-		if (now - last_led_tick >= 1000)
-		{
-				last_led_tick = now;
-				HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_10);
-		}
-    lsm6dsv16x_flag_data_ready_get(&atk_ms6dsv, &drdy);
-    if (drdy.drdy_xl)
-    {
-         lsm6dsv16x_acceleration_raw_get(&atk_ms6dsv, data_raw_acceleration);
-         acceleration_mg[0] = lsm6dsv16x_from_fs2_to_mg(data_raw_acceleration[0]);
-         acceleration_mg[1] = lsm6dsv16x_from_fs2_to_mg(data_raw_acceleration[1]);
-         acceleration_mg[2] = lsm6dsv16x_from_fs2_to_mg(data_raw_acceleration[2]);
-    }
+		  uint32_t now = osKernelGetTickCount();
+		  if (now - last_led_tick >= 1000)
+		  {
+				  last_led_tick = now;
+				  HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_10);
+		  }
+		  //imu
+      lsm6dsv16x_flag_data_ready_get(&atk_ms6dsv, &drdy);
+      if (drdy.drdy_xl)
+      {
+           lsm6dsv16x_acceleration_raw_get(&atk_ms6dsv, data_raw_acceleration);
+           acceleration_mg[0] = lsm6dsv16x_from_fs2_to_mg(data_raw_acceleration[0]);
+           acceleration_mg[1] = lsm6dsv16x_from_fs2_to_mg(data_raw_acceleration[1]);
+           acceleration_mg[2] = lsm6dsv16x_from_fs2_to_mg(data_raw_acceleration[2]);
+      }
      
-    if (drdy.drdy_gy)
-    {
-         lsm6dsv16x_angular_rate_raw_get(&atk_ms6dsv, data_raw_angular_rate);
-         angular_rate_mdps[0] = lsm6dsv16x_from_fs2000_to_mdps(data_raw_angular_rate[0]);
-         angular_rate_mdps[1] = lsm6dsv16x_from_fs2000_to_mdps(data_raw_angular_rate[1]);
-         angular_rate_mdps[2] = lsm6dsv16x_from_fs2000_to_mdps(data_raw_angular_rate[2]);
-    }
-    if (++i2ctimes == 20)
-    {
-        i2ctimes = 0;
-				int16_t ax =(int16_t)acceleration_mg[0];
-				int16_t ay =(int16_t)acceleration_mg[1];
-				int16_t az =(int16_t)acceleration_mg[2];
-				int16_t gx = (int16_t)angular_rate_mdps[0];
-				int16_t gy = (int16_t)angular_rate_mdps[1];
-				int16_t gz = (int16_t)angular_rate_mdps[2];
-				imu_data[0] = ax>>8;
-				imu_data[1] = ax&0xFF;
-				imu_data[2] = ay>>8;
-				imu_data[3] = ay&0xFF;
-				imu_data[4] = az>>8;
-				imu_data[5] = az&0xFF;
-				imu_data[6] = gx>>8;
-					
-				imu_data[7] = gx&0xFF;
-				imu_data[8] = gy>>8;
-				imu_data[9] = gy&0xFF;
-				imu_data[10] = gz>>8;
-				imu_data[11] = gz&0xFF;
-					
-					
-				tx_len = serial_frame_build(
-							0x11,
-						imu_data,
-						sizeof(imu_data),
-						tx_buf,
-						sizeof(tx_buf)
-				);
-				HAL_UART_Transmit(&huart6,tx_buf,tx_len,50);
-     }
-    
-     osDelay(10);
+      if (drdy.drdy_gy)
+      {
+           lsm6dsv16x_angular_rate_raw_get(&atk_ms6dsv, data_raw_angular_rate);
+           angular_rate_mdps[0] = lsm6dsv16x_from_fs2000_to_mdps(data_raw_angular_rate[0]);
+           angular_rate_mdps[1] = lsm6dsv16x_from_fs2000_to_mdps(data_raw_angular_rate[1]);
+           angular_rate_mdps[2] = lsm6dsv16x_from_fs2000_to_mdps(data_raw_angular_rate[2]);
+      }
+	
+			
+			uint32_t imu_ts;
+			lsm6dsv16x_timestamp_raw_get(&atk_ms6dsv, &imu_ts);
+			imu_data[0] = imu_ts >> 24;
+			imu_data[1] = imu_ts >> 16;
+			imu_data[2] = imu_ts >> 8;
+			imu_data[3] = imu_ts & 0xFF;
+		
+			int16_t ax =(int16_t)acceleration_mg[0];
+			int16_t ay =(int16_t)acceleration_mg[1];
+			int16_t az =(int16_t)acceleration_mg[2];
+			int16_t gx = (int16_t)angular_rate_mdps[0];
+			int16_t gy = (int16_t)angular_rate_mdps[1];
+			int16_t gz = (int16_t)angular_rate_mdps[2];
+			imu_data[4]  = ax >> 8;
+			imu_data[5]  = ax & 0xFF;
+			imu_data[6]  = ay >> 8;
+			imu_data[7]  = ay & 0xFF;
+			imu_data[8]  = az >> 8;
+			imu_data[9]  = az & 0xFF;
+			imu_data[10] = gx >> 8;
+			imu_data[11] = gx & 0xFF;
+			imu_data[12] = gy >> 8;
+			imu_data[13] = gy & 0xFF;
+			imu_data[14] = gz >> 8;
+			imu_data[15] = gz & 0xFF;
+				
+				
+			tx_len = serial_frame_build(
+						0x11,
+					imu_data,
+					sizeof(imu_data),
+					tx_buf,
+					sizeof(tx_buf)
+			);
+			HAL_UART_Transmit(&huart6,tx_buf,tx_len,50);
+
+
+      osDelay(10);
   }
   /* USER CODE END Status_Task */
 }
@@ -470,25 +512,47 @@ void NeckTask(void *argument)
   for(;;)
   {
       if (xQueueReceive(neckQueue, &cmd, portMAX_DELAY) == pdTRUE)
-      {
-          Neck_R_SetTargetAngle(cmd.angle);
-					Neck_Pitch_SetTargetAngle(cmd.pitch_angle);
-          
-          last = xTaskGetTickCount();
-          while (neck_r_cur_angle != neck_r_target_angle || neck_pitch_cur != neck_pitch_target)
-					{
-							Neck_Pitch_Update(); 
-						
-							if (xQueueReceive(neckQueue, &cmd, 0) == pdTRUE)
-							{
-									Neck_R_SetTargetAngle(cmd.angle);
-									Neck_Pitch_SetTargetAngle(cmd.pitch_angle);
-							}
-							vTaskDelay(pdMS_TO_TICKS(20));
-					}
-      }
+        {
+            Neck_R_SetTargetAngle(cmd.angle);
+            Neck_Pitch_SetTargetAngle(cmd.pitch_angle);
+
+            // 2?? ??????????
+            while (neck_r_cur_angle != neck_r_target_angle ||
+                   neck_pitch_cur  != neck_pitch_target)
+            {
+                Neck_Pitch_Update();
+                vTaskDelay(pdMS_TO_TICKS(20));
+            }
+            // 3?? ???,???????
+        }
   }
   /* USER CODE END NeckTask */
+}
+
+/* USER CODE BEGIN Header_MotorRxTask */
+/**
+* @brief Function implementing the motorRxTask thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_MotorRxTask */
+void MotorRxTask(void *argument)
+{
+  /* USER CODE BEGIN MotorRxTask */
+	xUART_TypeDef *pRx;
+  /* Infinite loop */
+  for(;;)
+  {
+        if (xQueueReceive(uart2RxQueue, &pRx, portMAX_DELAY) == pdPASS)
+        {
+            if (pRx->RxNum > 0)
+            {
+                Motor_ProcessRxData(pRx->RxData, pRx->RxNum);
+            }
+        }
+    osDelay(1);
+  }
+  /* USER CODE END MotorRxTask */
 }
 
 /* Private application code --------------------------------------------------*/

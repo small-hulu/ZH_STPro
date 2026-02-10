@@ -192,6 +192,7 @@ void SystemClock_Config(void)
 /* USER CODE BEGIN 4 */
 void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
 {
+		BaseType_t xHigherPriorityTaskWoken = pdFALSE; 
     if (huart == &huart2)                                                             
     {
         __HAL_UNLOCK(huart);                                                          
@@ -199,6 +200,7 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
         xUART2.RxNum  = Size;                                                         
         memset(xUART2.RxData, 0, sizeof(xUART2.RxData));                              
         memcpy(xUART2.RxData, xUART2.RxTemp, Size);                                   
+				//xQueueSendFromISR(uart2RxQueue, &xUART2, &xHigherPriorityTaskWoken);
 
         Motor_ProcessRxData(xUART2.RxData, Size);
         HAL_UARTEx_ReceiveToIdle_DMA(&huart2, xUART2.RxTemp, sizeof(xUART2.RxTemp));  

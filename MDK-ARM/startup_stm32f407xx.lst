@@ -464,7 +464,7 @@ ARM Macro Assembler    Page 8
   171 00000000                 IMPORT           SystemInit
   172 00000000                 IMPORT           __main
   173 00000000         
-  174 00000000 4809            LDR              R0, =SystemInit
+  174 00000000 4809    i       LDR              R0, =SystemInit
   175 00000002 4780            BLX              R0
   176 00000004 4809            LDR              R0, =__main
   177 00000006 4700            BX               R0
@@ -1891,7 +1891,15 @@ Symbol: __user_initial_stackheap
    Uses
       At line 408 in file startup_stm32f407xx.s
 Comment: __user_initial_stackheap used once
-94 symbols
+i 00000000
+
+Symbol: i
+   Definitions
+      At line 174 in file startup_stm32f407xx.s
+   Uses
+      None
+Comment: i unused
+95 symbols
 
 
 
@@ -1956,4 +1964,4 @@ Symbol: __use_two_region_memory
       None
 Comment: __use_two_region_memory unused
 3 symbols
-448 symbols in table
+449 symbols in table

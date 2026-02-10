@@ -76,22 +76,35 @@ void FeedBack(){
  */
 int16_t rpm_l,rpm_r;
 float v_left,v_right;
-#define MS_TO_RPM (60.0f / (2.0f * M_PI * WHEEL_RADIUS_M))
-
-void Motor_SetSpeed_FromCmd(const cmd_vel_t *cmd, uint8_t acc)
+MotorFeedback_t g_motor1_fb,g_motor2_fb;
+float wheel_v_left  = 0.0f;
+float wheel_v_right = 0.0f;
+void Motor_SetSpeed_FromCmd(const cmd_vel_t *cmd,
+                            uint8_t acc,
+                            float *v_left_out,
+                            float *v_right_out)
 {
-    float linear_x_m_s = cmd->linear_x_mm_s / 1000.0f;
+    float linear_x_m_s   = cmd->linear_x_mm_s / 1000.0f;
     float angular_z_rad_s = cmd->angular_z_mrad / 1000.0f;
 
     v_left  = linear_x_m_s - angular_z_rad_s * (WHEEL_BASE_M / 2.0f);
     v_right = linear_x_m_s + angular_z_rad_s * (WHEEL_BASE_M / 2.0f);
 
-    rpm_l = (int16_t)(v_left  * MS_TO_RPM) *10;
-    rpm_r = (-(int16_t)(v_right * MS_TO_RPM)) * 10;
-
-
+    int16_t rpm_l = (int16_t)(v_left  * MS_TO_RPM) * 10;
+    int16_t rpm_r = (-(int16_t)(v_right * MS_TO_RPM)) * 10;
     Motor_SetSpeed(1, rpm_l, acc);
+    if (Motor_GetFeedback(&g_motor1_fb, 1))
+    {
+        *v_left_out = (g_motor1_fb.speed * RPM_TO_MPS) / 10.0f;
+    }
+
+    osDelay(10);
+
     Motor_SetSpeed(2, rpm_r, acc);
+    if (Motor_GetFeedback(&g_motor2_fb, 2))
+    {
+        *v_right_out = (g_motor2_fb.speed * RPM_TO_MPS) / 10.0f;
+    }
 }
 
 /**********************************************************翅膀电机控制*********************************************************/
@@ -150,14 +163,14 @@ void ArmWave()//挥手
 }
 void ArmGive()//伸手
 {
-	Stepper_SetSpeed(5);
-	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_3, 1000);//左翅根摆动
-	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_4, 0);
-	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_3, 1000);//右翅根摆动
-	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_4, 0);
-	osDelay(400);
-	Stepper_RotateAngle1(15, STEPPER_BACKWARD);//翅中摆动
-	Stepper_RotateAngle2(15, STEPPER_FORWARD);//翅中摆动
+//	Stepper_SetSpeed(5);
+//	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_3, 1000);//左翅根摆动
+//	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_4, 0);
+//	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_3, 1000);//右翅根摆动
+//	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_4, 0);
+//	osDelay(400);
+//	Stepper_RotateAngle1(15, STEPPER_BACKWARD);//翅中摆动
+//	Stepper_RotateAngle2(15, STEPPER_FORWARD);//翅中摆动
 	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, 1000);//左翅尖摆动
 	__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, 2000);
 	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, 1000);//右翅尖摆动
@@ -354,6 +367,7 @@ void Armidle1()//次子
 	osDelay(delay_ms);
 	Stepper_RotateAngle1(7, STEPPER_FORWARD);//左翅中摆动
 }
+
 void ArmRaise1()//举手1次子
 {
 	Stepper_SetSpeed(5);
@@ -398,12 +412,12 @@ void ArmRaise2()//举手次子
 	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_2, 2000);
 	osDelay(10);
 }
+
 void ArmRaise3()//举手3次子
 {
 	Stepper_SetSpeed(5);
 
 	Stepper_RotateAngle1(17, STEPPER_FORWARD);//左翅中摆动
-
 }
 
 

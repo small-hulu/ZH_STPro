@@ -306,7 +306,6 @@ void USART6_IRQHandler(void)
        
         frame.len = rx_len;
         memcpy(frame.data, rx_buf, rx_len);
-//				frame.data[frame.len ] = '\n';
 			
         xQueueSendFromISR(
             uartQueue,
