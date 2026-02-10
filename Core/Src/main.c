@@ -118,7 +118,8 @@ int main(void)
 	delay_init();
 	
 	HAL_Delay(3000);
-	Car_Init();
+	moto_r_init(); 
+	moto_l_init();
   /* USER CODE END 2 */
 
   /* Init scheduler */
@@ -190,22 +191,7 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
-{
-		BaseType_t xHigherPriorityTaskWoken = pdFALSE; 
-    if (huart == &huart2)                                                             
-    {
-        __HAL_UNLOCK(huart);                                                          
 
-        xUART2.RxNum  = Size;                                                         
-        memset(xUART2.RxData, 0, sizeof(xUART2.RxData));                              
-        memcpy(xUART2.RxData, xUART2.RxTemp, Size);                                   
-				//xQueueSendFromISR(uart2RxQueue, &xUART2, &xHigherPriorityTaskWoken);
-
-        Motor_ProcessRxData(xUART2.RxData, Size);
-        HAL_UARTEx_ReceiveToIdle_DMA(&huart2, xUART2.RxTemp, sizeof(xUART2.RxTemp));  
-    }
-}
 
 /* USER CODE END 4 */
 

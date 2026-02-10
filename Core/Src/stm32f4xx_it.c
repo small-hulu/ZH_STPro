@@ -57,8 +57,6 @@
 
 /* External variables --------------------------------------------------------*/
 extern DMA_HandleTypeDef hdma_usart1_rx;
-extern DMA_HandleTypeDef hdma_usart2_rx;
-extern DMA_HandleTypeDef hdma_usart2_tx;
 extern DMA_HandleTypeDef hdma_usart6_rx;
 extern UART_HandleTypeDef huart1;
 extern UART_HandleTypeDef huart2;
@@ -168,34 +166,6 @@ void DebugMon_Handler(void)
 /******************************************************************************/
 
 /**
-  * @brief This function handles DMA1 stream5 global interrupt.
-  */
-void DMA1_Stream5_IRQHandler(void)
-{
-  /* USER CODE BEGIN DMA1_Stream5_IRQn 0 */
-
-  /* USER CODE END DMA1_Stream5_IRQn 0 */
-  HAL_DMA_IRQHandler(&hdma_usart2_rx);
-  /* USER CODE BEGIN DMA1_Stream5_IRQn 1 */
-
-  /* USER CODE END DMA1_Stream5_IRQn 1 */
-}
-
-/**
-  * @brief This function handles DMA1 stream6 global interrupt.
-  */
-void DMA1_Stream6_IRQHandler(void)
-{
-  /* USER CODE BEGIN DMA1_Stream6_IRQn 0 */
-
-  /* USER CODE END DMA1_Stream6_IRQn 0 */
-  HAL_DMA_IRQHandler(&hdma_usart2_tx);
-  /* USER CODE BEGIN DMA1_Stream6_IRQn 1 */
-
-  /* USER CODE END DMA1_Stream6_IRQn 1 */
-}
-
-/**
   * @brief This function handles TIM1 update interrupt and TIM10 global interrupt.
   */
 void TIM1_UP_TIM10_IRQHandler(void)
@@ -215,29 +185,29 @@ void TIM1_UP_TIM10_IRQHandler(void)
 void USART1_IRQHandler(void)
 {
   /* USER CODE BEGIN USART1_IRQn 0 */
-//	 if (__HAL_UART_GET_FLAG(&huart1, UART_FLAG_IDLE))
-//    {
+	 if (__HAL_UART_GET_FLAG(&huart1, UART_FLAG_IDLE))
+    {
 
-//				BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-//				 __HAL_UART_CLEAR_IDLEFLAG(&huart1);
-//        HAL_UART_DMAStop(&huart1);
+				BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+				 __HAL_UART_CLEAR_IDLEFLAG(&huart1);
+        HAL_UART_DMAStop(&huart1);
 
-//        uint16_t rx_len =
-//            RX_BUF_LEN - __HAL_DMA_GET_COUNTER(huart1.hdmarx);
-//		
-//       
-//        frame.len = rx_len;
-//        memcpy(frame.data, rx_buf, rx_len);
-////				frame.data[frame.len ] = '\n';
-//			
-//        xQueueSendFromISR(
-//            uartQueue,
-//            &frame,
-//            &xHigherPriorityTaskWoken
-//        );
-//				
-//        HAL_UART_Receive_DMA(&huart1, rx_buf, RX_BUF_LEN);
-//    }
+        uint16_t rx_len =
+            RX_BUF_LEN - __HAL_DMA_GET_COUNTER(huart1.hdmarx);
+		
+       
+        frame.len = rx_len;
+        memcpy(frame.data, rx_buf, rx_len);
+//				frame.data[frame.len ] = '\n';
+			
+        xQueueSendFromISR(
+            uartQueue,
+            &frame,
+            &xHigherPriorityTaskWoken
+        );
+				
+        HAL_UART_Receive_DMA(&huart1, rx_buf, RX_BUF_LEN);
+    }
   /* USER CODE END USART1_IRQn 0 */
   HAL_UART_IRQHandler(&huart1);
   /* USER CODE BEGIN USART1_IRQn 1 */
@@ -293,28 +263,28 @@ void DMA2_Stream5_IRQHandler(void)
 void USART6_IRQHandler(void)
 {
   /* USER CODE BEGIN USART6_IRQn 0 */
-	 if (__HAL_UART_GET_FLAG(&huart6, UART_FLAG_IDLE))
-    {
+//	 if (__HAL_UART_GET_FLAG(&huart6, UART_FLAG_IDLE))
+//    {
 
-				BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-				 __HAL_UART_CLEAR_IDLEFLAG(&huart6);
-        HAL_UART_DMAStop(&huart6);
+//				BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+//				 __HAL_UART_CLEAR_IDLEFLAG(&huart6);
+//        HAL_UART_DMAStop(&huart6);
 
-        uint16_t rx_len =
-            RX_BUF_LEN - __HAL_DMA_GET_COUNTER(huart6.hdmarx);
-		
-       
-        frame.len = rx_len;
-        memcpy(frame.data, rx_buf, rx_len);
-			
-        xQueueSendFromISR(
-            uartQueue,
-            &frame,
-            &xHigherPriorityTaskWoken
-        );
-				
-        HAL_UART_Receive_DMA(&huart6, rx_buf, RX_BUF_LEN);
-    }
+//        uint16_t rx_len =
+//            RX_BUF_LEN - __HAL_DMA_GET_COUNTER(huart6.hdmarx);
+//		
+//       
+//        frame.len = rx_len;
+//        memcpy(frame.data, rx_buf, rx_len);
+//			
+//        xQueueSendFromISR(
+//            uartQueue,
+//            &frame,
+//            &xHigherPriorityTaskWoken
+//        );
+//				
+//        HAL_UART_Receive_DMA(&huart6, rx_buf, RX_BUF_LEN);
+//    }
   /* USER CODE END USART6_IRQn 0 */
   HAL_UART_IRQHandler(&huart6);
   /* USER CODE BEGIN USART6_IRQn 1 */

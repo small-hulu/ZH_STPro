@@ -26,6 +26,10 @@
 #include <stdio.h>
 #include "usart.h"
 #include "main.h"
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
 
 //Middlewares
 #include "FreeRTOS.h"
@@ -35,7 +39,6 @@
 // platform
 #include "fsm_lib.h"
 #include "act.h"
-#include "motor.h"
 #include "tim.h"
 #include "StepMotor.h"
 #include "serial_frame.h"
@@ -44,7 +47,7 @@
 #include "m0603a.h"
 #include "m0603a_port.h"
 // app
-
+#include "motor_ctrl.h"
 void bsp_init();
 void user_main();
 

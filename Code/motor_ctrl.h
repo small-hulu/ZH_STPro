@@ -1,10 +1,10 @@
 /***************************************************************************
- * Copyright  2025 
+ * Copyright  2026 
  * All right reserved. See COPYRIGHT for detailed Information.
  *
- * @file        user_main.h
+ * @file        motor_ctrl.h
  *
- * @author     
+ * @author     xushaowei
  * @brief      
  *
  * @Email     
@@ -17,4 +17,10 @@
 #include "user_main.h"
 
 
+
+
+
+void moto_l_init();
+void moto_r_init();
+void motor_set_get_speed_from_cmd(const cmd_vel_t *cmd, uint8_t acc, float *v_left_out, float *v_right_out);
 #endif

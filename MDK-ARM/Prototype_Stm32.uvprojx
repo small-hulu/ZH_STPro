@@ -339,7 +339,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32F407xx</Define>
               <Undefine></Undefine>
-              <IncludePath>../Core/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F4xx/Include;../Drivers/CMSIS/Include;../Middlewares/Third_Party/FreeRTOS/Source/include;../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2;../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F;../Platform/FSM;../Code;../Platform/Motor;../Platform/SERIAL_FRAME;../Platform/M0603A</IncludePath>
+              <IncludePath>../Core/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F4xx/Include;../Drivers/CMSIS/Include;../Middlewares/Third_Party/FreeRTOS/Source/include;../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2;../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F;../Platform/FSM;../Code;../Platform/Motor;../Platform/SERIAL_FRAME;../Platform/M0603A;../Platform/VL53L0X/core/inc;../Platform/VL53L0X/platform/inc;../Platform/IMU</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -393,11 +393,6 @@
         <Group>
           <GroupName>Application/User/Core</GroupName>
           <Files>
-            <File>
-              <FileName>demo.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Core\Src\demo.c</FilePath>
-            </File>
             <File>
               <FileName>main.c</FileName>
               <FileType>1</FileType>
@@ -1596,11 +1591,6 @@
               <FilePath>..\Platform\Motor\drv8825.c</FilePath>
             </File>
             <File>
-              <FileName>motor.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Platform\Motor\motor.c</FilePath>
-            </File>
-            <File>
               <FileName>StepMotor.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Platform\Motor\StepMotor.c</FilePath>
@@ -1659,6 +1649,46 @@
               <FileName>motor_ctrl.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Code\motor_ctrl.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>VL53L0X</GroupName>
+          <Files>
+            <File>
+              <FileName>vl53l0x_api.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Platform\VL53L0X\core\src\vl53l0x_api.c</FilePath>
+            </File>
+            <File>
+              <FileName>vl53l0x_api_calibration.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Platform\VL53L0X\core\src\vl53l0x_api_calibration.c</FilePath>
+            </File>
+            <File>
+              <FileName>vl53l0x_api_core.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Platform\VL53L0X\core\src\vl53l0x_api_core.c</FilePath>
+            </File>
+            <File>
+              <FileName>vl53l0x_api_ranging.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Platform\VL53L0X\core\src\vl53l0x_api_ranging.c</FilePath>
+            </File>
+            <File>
+              <FileName>vl53l0x_api_strings.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Platform\VL53L0X\core\src\vl53l0x_api_strings.c</FilePath>
+            </File>
+            <File>
+              <FileName>vl53l0x_i2c.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Platform\VL53L0X\platform\src\vl53l0x_i2c.c</FilePath>
+            </File>
+            <File>
+              <FileName>vl53l0x_platform.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Platform\VL53L0X\platform\src\vl53l0x_platform.c</FilePath>
             </File>
           </Files>
         </Group>

@@ -34,13 +34,13 @@
 *																		 back
 *																		Servo_3
 *																		
-*																		Servo_R
+*																		
 *																		
 *														Servo_1						Servo_2
 *0:0.5ms-50   45:1ms-100	90:1.5ms-150		135:2ms-200			180:2.5ms-250
  */
 /*
-void NeckTwist(uint8_t Angle)
+void NeckTwist(uint8_t Angle)Servo_R
 {
 	if((Angle>Servo_R_MAX) || (Angle<Servo_R_MIN))
 	{
@@ -62,6 +62,8 @@ void NeckTwist(uint8_t Angle)
   * @retval cmd status
 
   */
+#define NECK_PITCH_MIN   (-30)
+#define NECK_PITCH_MAX   (60)
 int16_t neck_r_cur_angle = 90; 
 int16_t neck_r_target_angle = 90;
 
@@ -71,10 +73,11 @@ int16_t neck_pitch_target = 0;
 uint16_t neck1_ccr = 100;
 uint16_t neck2_ccr = 100;
 uint16_t neck3_ccr = 100;
+
 void Neck_Pitch_SetTargetAngle(int16_t angle)
 {
-    if (angle < 0)  angle = 0;
-    if (angle > 60) angle = 60;
+    if (angle < NECK_PITCH_MIN)  angle = NECK_PITCH_MIN;
+    if (angle > NECK_PITCH_MAX)  angle = NECK_PITCH_MAX;
 
     neck_pitch_target = angle;
 }
@@ -93,8 +96,8 @@ void Neck_Pitch_Update(void)
     uint16_t r_ccr = neck_angle_to_ccr(neck_r_cur_angle);
 
     neck1_ccr = CLAMP(100 + neck_pitch_cur, NECK_1_MIN, NECK_1_MAX);
-    neck2_ccr = CLAMP(100 - neck_pitch_cur, NECK_2_MIN, NECK_2_MAX);
-    neck3_ccr = CLAMP(100 + neck_pitch_cur, NECK_3_MIN, NECK_3_MAX);
+    neck2_ccr = CLAMP(100 + neck_pitch_cur, NECK_2_MIN, NECK_2_MAX);
+    neck3_ccr = CLAMP(100 - neck_pitch_cur, NECK_3_MIN, NECK_3_MAX);
 
     __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, r_ccr);  // 水平
     __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, neck1_ccr);
@@ -171,6 +174,7 @@ void NeckUpDown()
 		HAL_Delay(50);
 	}
 }
+
 void NeckShow(){
 	for(uint8_t i=0;i<len;i++){
 		__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 50+(servo1_angles[i]-30)/0.9);
